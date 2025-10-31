@@ -1,18 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, NgbCollapseModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
 export class Navbar {
-  logoUrl = "assets/bpmLogo.png"
-  isMenuOpen = false;
-
-  toggleMenu(){
-    this.isMenuOpen = !this.isMenuOpen
-  }
+  isMenuCollapsed = true;
+  logoUrl = 'assets/bpmLogo.png';
 }
