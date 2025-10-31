@@ -1,17 +1,22 @@
 import { Routes } from '@angular/router';
 import { App } from './app';
 import { Loremipsum } from './components/loremipsum/loremipsum';
+import { Home } from './pages/home/home';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
+    component: Home,
+    title: 'Home page',
+  },
+  {
+    path: 'home',
     pathMatch: 'full',
-    title: "Home Page"
+    redirectTo: '',
   },
   {
     path: 'loremipsum',
     component: Loremipsum,
-    title: 'Lorem Ipsum'
-  }
+    title: 'Lorem Ipsum',
+  },
 ];

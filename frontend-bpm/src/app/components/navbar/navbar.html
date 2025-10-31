@@ -1,9 +1,11 @@
 <nav class="navbar">
   <div class="navbar-container">
-    <div class="navbar-brand">
-      <img src={{logoUrl}} alt="BPM" class="navbar-logo">
-      <span class="navbar-title">FitConnect</span>
-    </div>
+    <a routerLink="/">
+      <div class="navbar-brand">
+        <img src={{logoUrl}} alt="BPM" class="navbar-logo">
+        <span class="navbar-title">BPM</span>
+      </div>
+    </a>
     
     <button class="navbar-toggle" (click)="toggleMenu()" [class.active]="isMenuOpen">
       <span></span>
