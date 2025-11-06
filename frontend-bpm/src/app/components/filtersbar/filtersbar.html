@@ -1,0 +1,29 @@
+<div class="row mb-3 ">
+	<div class="col">
+            <div ngbDropdown class="d-block w-100">
+                <label class="form-label" for="dropdownBasic1">Zona</label>
+                <button type="button" class="btn btn-outline-dark w-100 d-flex justify-content-between align-items-center" id="dropdownBasic1" ngbDropdownToggle>
+                    {{ selectedZone }}
+                </button>
+                <div ngbDropdownMenu class="w-100">
+                    <button ngbDropdownItem (click)="select('Zona 1')">Zona 1</button>
+                    <button ngbDropdownItem (click)="select('Zona 2')">Zona 2</button>
+                    <button ngbDropdownItem (click)="select('Zona 3')">Zona 3</button>
+                </div>
+            </div>
+	</div>
+    <div class="col">
+        <label for="dataInizio" class="form-label">Data Inizio</label>
+        <input 
+            type="date" 
+            id="dataInizio" 
+            class="form-control">
+    </div>
+    <div class="col">
+        <label for="dataFine" class="form-label">Data Fine</label>
+        <input 
+            type="date" 
+            id="dataFine" 
+            class="form-control">
+    </div>
+</div>
