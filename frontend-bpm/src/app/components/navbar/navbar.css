@@ -1,20 +1,3 @@
-.navbar-brand {
-  color: #1a1a1a;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.navbar-brand:hover {
-  color: #007bff;
-}
-
-.nav-link {
-  font-weight: 500;
-  transition: color 0.3s ease;
-  cursor: pointer;
-  padding: 0.5rem 1rem;
-}
-
 .nav-link:hover {
   color: #007bff !important;
 }
@@ -22,13 +5,4 @@
 .nav-link.active {
   color: #007bff !important;
   border-bottom: 2px solid #007bff;
-}
-
-.sticky-top {
-  z-index: 1020;
-}
-
-/* Animazione smooth per il collapse */
-.navbar-collapse {
-  transition: height 0.3s ease;
 }
