@@ -10,6 +10,9 @@ import GeoJSON from 'ol/format/GeoJSON';
 import Style from 'ol/style/Style';
 import Icon from 'ol/style/Icon';
 
+
+/*TODO: on marker click, show popup OR open side window*/
+
 @Component({
   selector: 'app-map',
   imports: [],
