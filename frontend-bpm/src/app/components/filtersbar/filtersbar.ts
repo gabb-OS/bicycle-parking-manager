@@ -8,11 +8,10 @@ import { NgbDatepicker, NgbDropdownModule } from "@ng-bootstrap/ng-bootstrap";
   styleUrl: './filtersbar.css',
 })
 export class Filtersbar {
-  // label shown on the dropdown button
-  selectedZone = 'Area di Parcheggio';
+  selectedZone = '';
 
-  // called when a dropdown item is selected
   protected select(zone: string) {
     this.selectedZone = zone;
+    console.log('Selected zone:', this.selectedZone);
   }
 }

@@ -1,45 +1,45 @@
 <div class="row">
     <div class="col">
         
-        <nav class="navbar navbar-expand-lg navbar-white bg-light shadow-sm px-3">
+        <nav class="navbar navbar-expand-lg navbar-white bg-light shadow-sm px-3 z-3">
         
-        <a class="navbar-brand d-flex align-items-center" routerLink="/">
-        <img [src]="logoUrl" alt="BPM" width="40" height="40" class="me-2">
-        <span class="fw-bold fs-4">BPM</span>
-        </a>
-
-        <button 
-        class="navbar-toggler" 
-        type="button" 
-        (click)="isMenuCollapsed = !isMenuCollapsed"
-        aria-controls="navbarNav"
-        aria-label="Toggle navigation">
-        <div class="navbar-toggler-icon"></div>
-        </button>
-
-        <div class="collapse navbar-collapse" 
-            id="navbarNav" 
-            [ngbCollapse]="isMenuCollapsed">
-        <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-            <a class="nav-link" 
-                routerLink="/" 
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{exact: true}"
-                (click)="isMenuCollapsed = true">
-                Home
+            <a class="navbar-brand d-flex align-items-center" routerLink="/">
+            <img [src]="logoUrl" alt="BPM" width="40" height="40" class="me-2">
+            <span class="fw-bold fs-4">BPM</span>
             </a>
-            </li>
-            <li class="nav-item">
-            <a class="nav-link" 
-                routerLink="/loremipsum" 
-                routerLinkActive="active"
-                (click)="isMenuCollapsed = true">
-                Lorem Ipsum
-            </a>
-            </li>
-        </ul>
-        </div>
+
+            <button 
+            class="navbar-toggler" 
+            type="button" 
+            (click)="isMenuCollapsed = !isMenuCollapsed"
+            aria-controls="navbarNav"
+            aria-label="Toggle navigation">
+            <div class="navbar-toggler-icon"></div>
+            </button>
+
+            <div class="collapse navbar-collapse" 
+                id="navbarNav" 
+                [ngbCollapse]="isMenuCollapsed">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                <a class="nav-link" 
+                    routerLink="/" 
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{exact: true}"
+                    (click)="isMenuCollapsed = true">
+                    Home
+                </a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" 
+                    routerLink="/loremipsum" 
+                    routerLinkActive="active"
+                    (click)="isMenuCollapsed = true">
+                    Lorem Ipsum
+                </a>
+                </li>
+            </ul>
+            </div>
 
         </nav>
     </div>
