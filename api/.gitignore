@@ -1,0 +1,130 @@
+############################
+# GENERAL
+############################
+
+# Environment & local configs
+.env
+.venv
+.env.*
+*.local
+*.secret
+*.bak
+*.tmp
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Dependency directories
+node_modules/
+bower_components/
+vendor/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# Build outputs
+dist/
+build/
+tmp/
+out/
+out-tsc/
+coverage/
+bazel-out/
+.cache/
+.angular/
+.angular/cache/
+.docs/
+
+# Generated reports and test outputs
+test-output/
+__screenshots__/
+reports/
+coverage-final.json
+lcov-report/
+
+# Package managers
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+poetry.lock
+
+# IDEs / Editors
+.idea/
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.settings/
+*.sublime-workspace
+*.code-workspace
+.project
+.classpath
+.c9/
+*.launch
+
+# OS-specific
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Miscellaneous
+.sass-cache/
+connect.lock
+libpeerconnection.log
+typings/
+.history/
+docs/
+*.iml
+
+############################
+# FRONTEND ANGULAR (frontend-bpm)
+############################
+
+frontend-bpm/dist/
+frontend-bpm/tmp/
+frontend-bpm/out-tsc/
+frontend-bpm/coverage/
+frontend-bpm/node_modules/
+frontend-bpm/.angular/
+frontend-bpm/.angular/cache/
+frontend-bpm/e2e/test-output/
+frontend-bpm/.ng/
+frontend-bpm/*.tsbuildinfo
+
+############################
+# BACKEND / OTHER MODULES
+############################
+
+# Node backend (if present)
+**/node_modules/
+**/dist/
+**/build/
+**/logs/
+**/tmp/
+**/coverage/
+
+# Python backend (if present)
+**/venv/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+
+# Java (if present)
+**/target/
+**/*.class
+**/*.jar
+**/*.war
+**/*.ear
