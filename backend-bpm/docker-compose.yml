@@ -1,18 +1,18 @@
 services:
-  api:
-    container_name: api
+  backend-bpm:
+    container_name: backend-bpm
     build:
-      context: ./api
+      context: .
       dockerfile: Dockerfile
     ports:
-      - 8008:4000    
+      - 8000:4000    
     depends_on:
-      api_db:
+      backend-bpm_db:
         condition: service_healthy    
     links: 
-        - api_db
-  api_db:
-    container_name: api_db
+        - backend-bpm_db
+  backend-bpm_db:
+    container_name: backend-bpm_db
     image: postgres:12
     ports:
       - "5432:5432"
