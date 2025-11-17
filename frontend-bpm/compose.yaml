@@ -8,15 +8,15 @@
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
 services:
-  angular-prod:
+  frontend-bpm-prod:
     build:
       context: .
       dockerfile: Dockerfile
-    #image: to assign the 
     ports:
       - "8080:8080"
+    image: frontend-bpm-prod
 
-  angular-dev:
+  frontend-bpm-dev:
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -27,6 +27,7 @@ services:
         - action: sync
           path: .
           target: /app
+    image: frontend-bpm-dev
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to

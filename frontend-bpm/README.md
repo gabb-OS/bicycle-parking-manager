@@ -1,59 +1,45 @@
-# FrontendBpm
+# Frontend for Bicycle Parking Manager (BPM)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.7.
+This is the Angular frontend service for the BPM application. It is designed to run with Docker and Docker Compose, communicating with the Flask backend service.
 
-## Development server
+## Prerequisites
 
-To start a local development server, run:
+Before you begin, ensure you have the following installed:
+* **Docker**
+* **Docker Compose**
 
-```bash
-ng serve
-```
+## How to Run
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+The `docker-compose.yaml` file is configured to set up two services:
+* `frontend-bpm-prod`: The Angular frontend, when ready to have a definitive version of the image.
+* `frontend-bpm-dev`: The Angular frontend, when still under development, useful to dynamically observe the changes applied to the application, via the `watch` directive.
 
-## Code scaffolding
+### Production environment
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+This single command will build the Angular app image ready for production, and run them in the background with the `-d` parameter.
 
 ```bash
-ng generate --help
+docker compose up -d --build frontend-bpm-prod
 ```
-
-## Building
-
-To build the project run:
+or using multiple commands, differentiating image building from container creation:
 
 ```bash
-ng build
+docker compose build frontend-bpm-prod
+
+docker compose up -d frontend-bpm-prod
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Development environment
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+This single command will build the Angular app image ready for development, and run them in the background with the `-d` parameter.
 
 ```bash
-ng test
+docker compose up -d --build frontend-bpm-dev
 ```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+or using multiple commands, differentiating image building from container creation:
 
 ```bash
-ng e2e
+docker compose build frontend-bpm-dev
+
+docker compose up -d frontend-bpm-dev
 ```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
