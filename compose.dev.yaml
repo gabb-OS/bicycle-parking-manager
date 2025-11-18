@@ -2,11 +2,14 @@ services:
   frontend:
     build:
       context: ./frontend-bpm
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    image: frontend-bpm-image
-    container_name: frontend-bpm
+      dockerfile: Dockerfile.dev
+    image: frontend-bpm-image-dev
+    container_name: frontend-bpm-dev
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend-bpm/src
+          target: /app/src
 #    networks:
 #      - app_network
 
