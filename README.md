@@ -1,6 +1,24 @@
 # Bicycle Parking Manager
 Smart bike parking manager project for the Context Aware Systems course
 
+## How to Run (Makefile)
+### Essentials
+To build:
+```bash
+make up
+```
+
+To take down containers:
+```bash
+make down
+```
+
+Add a ```-dev``` to parameter to run in dev mode, for example
+```bash
+make up-dev
+```
+
+For more infos and commands check the ```Makefile```
 ## How to Run (production)
 
 ```bash
