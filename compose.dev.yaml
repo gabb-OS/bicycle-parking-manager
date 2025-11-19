@@ -12,17 +12,10 @@ services:
           target: /app/src
 
   backend:
-    image: backend-bpm-image-dev
-    container_name: backend-bpm-dev
-    build:
-      context: ./backend-bpm
-      dockerfile: Dockerfile
     ports:
       - 8000:4000
 
 
   db:
-    image: postgres:12
-    container_name: db-bpm-dev
     ports:
       - "5432:5432"
