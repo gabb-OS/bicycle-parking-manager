@@ -15,9 +15,7 @@ services:
     container_name: backend-bpm
     build:
       context: ./backend-bpm
-      dockerfile: Dockerfile
-    ports:
-      - 8000:4000    
+      dockerfile: Dockerfile 
     depends_on:
       db:
         condition: service_healthy

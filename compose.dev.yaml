@@ -1,29 +1,28 @@
 services:
   frontend:
+    image: frontend-bpm-image-dev
+    container_name: frontend-bpm-dev
     build:
       context: ./frontend-bpm
       dockerfile: Dockerfile.dev
-    image: frontend-bpm-image-dev
-    container_name: frontend-bpm-dev
     develop:
       watch:
         - action: sync
           path: ./frontend-bpm/src
           target: /app/src
-#    networks:
-#      - app_network
 
-  # backend-bpm:
-  #   build: ./backend-bpm/compose.yaml
-  #   ports:
-  #     - "3000:3000"
-  #   networks:
-  #     - app_network
+  backend:
+    image: backend-bpm-image-dev
+    container_name: backend-bpm-dev
+    build:
+      context: ./backend-bpm
+      dockerfile: Dockerfile
+    ports:
+      - 8000:4000
 
-#networks:
-#  app_network:
-#    driver: bridge
 
-# Shared volumes if needed
-# volumes:
-#   shared_data:
+  db:
+    image: postgres:12
+    container_name: db-bpm-dev
+    ports:
+      - "5432:5432"
