@@ -13,9 +13,12 @@ services:
   backend:
     image: backend-bpm-image
     container_name: backend-bpm
+    ports:
+      - 8000:4000
     build:
       context: ./backend-bpm
       dockerfile: Dockerfile 
+    
     depends_on:
       db:
         condition: service_healthy
@@ -29,6 +32,8 @@ services:
   db:
     image: postgres:12
     container_name: db-bpm
+    ports:
+      - "5432:5432"
     # TODO: Use secrets management for production // use .env file
     environment:
       - POSTGRES_PASSWORD=postgres
