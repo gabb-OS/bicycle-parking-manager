@@ -3,12 +3,18 @@ from flaskr.config import Config
 from flaskr.database import db
 from flask_cors import CORS
 
+# Initialize Flask app
 app = Flask(__name__)
+
+# Enable CORS
 CORS(app)
+
+
 app.config.from_object(Config)
 app.config["SQLALCHEMY_DATABASE_URI"] = app.config.get("DB_URL")
 # db.init_app(app)
 
+# Table users
 class User(db.Model):
     __tablename__ = 'users'
 
@@ -18,7 +24,6 @@ class User(db.Model):
 
     def json(self):
         return {'id': self.id,'username': self.username, 'email': self.email}
-    
 # db.create_all()
 
 
