@@ -1,3 +1,5 @@
+# Future Work: obscure the ports and use an nginx proxy browser -> fronted -> backend for better security
+
 services:
   frontend:
     image: frontend-bpm-image
