@@ -5,8 +5,9 @@ services:
     build:
       context: ./frontend-bpm
       dockerfile: Dockerfile.dev
-    develop:
-      watch:
-        - action: sync
-          path: ./frontend-bpm/src
-          target: /app/src
+    # Il Bind Mount è necessario per lo sviluppo Angular:
+    # 1. Rende il codice sorgente locale immediatamente disponibile nel container (/app è il WORKDIR).
+    # 2. Risolve i problemi di hot reload (Live Reload / HMR) con Webpack/Angular CLI su macOS/Windows,
+    #    dove il file watcher nativo del container non riceve le notifiche di cambio file dall'host.
+    volumes:
+      - ./frontend-bpm:/app
