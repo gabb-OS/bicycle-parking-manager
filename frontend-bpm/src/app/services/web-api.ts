@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -9,12 +10,10 @@ export class WebApi {
   private baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
 
-  getHello(){
-    this.http.get(`${this.baseUrl}/`, {
+  // Il metodo restituisce un Observable di tipo stringa
+  getHello(): Observable<string> {
+    return this.http.get(`${this.baseUrl}/`, {
       responseType: 'text',
-      mode: 'cors'
-    }).subscribe(response => {
-      return response;
     });
   }
   
