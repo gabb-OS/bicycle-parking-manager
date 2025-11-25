@@ -27,6 +27,63 @@ class User(db.Model):
 # db.create_all()
 
 
-@app.route("/")
+
+# MISC
+@app.get("/")
 def hello_world():
     return f"<p>Hello, World!</p>"
+
+# ----------------------------------------------------------------------
+#                               USERS
+# ----------------------------------------------------------------------
+@app.post("/user/signup/")
+def user_signup():
+    return {"areas": []}
+
+@app.post("/user/signin/")
+def user_signin():
+    return {"areas": []}
+
+
+
+# ----------------------------------------------------------------------
+#                           PARKING AREAS
+# ----------------------------------------------------------------------
+# Returns poligons of all the parking areas, for a certain date, with:
+#   - residualCapacity
+#   - maxCapacity
+# If no timestamp is given, current residualCapacity is returned
+@app.get("/areas/capacity/<end_timestamp>")
+def get_parking_areas_capacity():
+    return {"areas": []}
+
+# Return poligons of parking areas, for a certain time interval
+@app.get("/areas/<start_timestamp>/<end_timestamp>")
+def get_past_parking_areas():
+    return {"areas": []}
+
+# Return single parking area residualCapacity, aggregated for a certain time interval
+# !! For simplicity now we can consider a default 'monthly' aggregation
+# "areas/capacity/<id>/<aggrType>"
+@app.get("/areas/capacity/<areaId>")
+def get_parking_areas_capacity_history():
+    return {"areas": []}
+
+
+
+# ----------------------------------------------------------------------
+#                           PARKING EVENTS
+# ----------------------------------------------------------------------
+# Signal a 'parking event' (from the App)
+# Incoming request payload must contain:
+#  - user id
+#  - gps coordinates
+#  - timestamp
+@app.post("/event/parking/")
+def parking_event():
+    return {"status": "success"}
+
+# Get all user 'parking events' (from the App)
+@app.get("/event/parking/<userId>")
+def get_user_parking_events():
+    return {"status": "success"}
