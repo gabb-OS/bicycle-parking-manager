@@ -29,6 +29,24 @@ services:
       retries: 10
       start_period: 10s
 
+  pgadmin_service:
+    image: dpage/pgadmin4
+    container_name: backend-bpm_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    ports:
+      - "15432:80"    # Keep port :80 inside container as per pgadmin official documentation
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      backend-bpm_db:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   pgdata: {}
+  pgadmin-data: {}
 
