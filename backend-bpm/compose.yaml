@@ -10,10 +10,10 @@ services:
       backend-bpm_db:
         condition: service_healthy    
     links: 
-        - backend-bpm_db
+        - backend-bpm_db:db
   backend-bpm_db:
     container_name: backend-bpm_db
-    image: postgres:12
+    image: postgis/postgis:12-3.4
     ports:
       - "5432:5432"
     environment:
