@@ -2,6 +2,7 @@ from flask import Flask
 from flaskr.config import Config
 from flaskr.database import db
 from flask_cors import CORS
+from app.modules import areas
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -9,9 +10,12 @@ app = Flask(__name__)
 # Enable CORS
 CORS(app)
 
+app.register_blueprint(areas.blueprint)
+
 
 app.config.from_object(Config)
 app.config["SQLALCHEMY_DATABASE_URI"] = app.config.get("DB_URL")
+
 # db.init_app(app)
 
 # Table users
@@ -44,30 +48,6 @@ def user_signup():
 def user_signin():
     return {"areas": []}
 
-
-
-# ----------------------------------------------------------------------
-#                           PARKING AREAS
-# ----------------------------------------------------------------------
-# Returns poligons of all the parking areas, for a certain date, with:
-#   - residualCapacity
-#   - maxCapacity
-# If no timestamp is given, current residualCapacity is returned
-@app.get("/areas/capacity/<end_timestamp>")
-def get_parking_areas_capacity():
-    return {"areas": []}
-
-# Return poligons of parking areas, for a certain time interval
-@app.get("/areas/<start_timestamp>/<end_timestamp>")
-def get_past_parking_areas():
-    return {"areas": []}
-
-# Return single parking area residualCapacity, aggregated for a certain time interval
-# !! For simplicity now we can consider a default 'monthly' aggregation
-# "areas/capacity/<id>/<aggrType>"
-@app.get("/areas/capacity/<areaId>")
-def get_parking_areas_capacity_history():
-    return {"areas": []}
 
 
 
