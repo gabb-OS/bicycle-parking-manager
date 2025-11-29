@@ -1,6 +1,9 @@
 flask
-psycopg2-binary
+psycopg[binary,pool]
 python-dotenv
 Flask-SQLAlchemy
+SQLAlchemy
+GeoAlchemy2
+Flask-Migrate
 flask-cors
 gunicorn

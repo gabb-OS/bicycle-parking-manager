@@ -1,8 +1,10 @@
 from flask import Flask
 from flaskr.config import Config
-from flaskr.database import db
+from flaskr.extensions import db, migrate
 from flask_cors import CORS
-from flaskr.modules import areas
+from flaskr.models import areas, users
+from flaskr.models import areas as areas_model, users as users_model
+
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -11,25 +13,19 @@ app = Flask(__name__)
 CORS(app)
 
 app.register_blueprint(areas.areas_bp)
+app.register_blueprint(users.users_bp)
 
 
 app.config.from_object(Config)
 app.config["SQLALCHEMY_DATABASE_URI"] = app.config.get("DB_URL")
+app.config['SQLALCHEMY_ECHO'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# db.init_app(app)
+db.init_app(app)
+migrate.init_app(app, db)
 
-# Table users
-class User(db.Model):
-    __tablename__ = 'users'
-
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-
-    def json(self):
-        return {'id': self.id,'username': self.username, 'email': self.email}
-# db.create_all()
-
+with app.app_context():
+    db.create_all()
 
 
 # MISC
@@ -37,33 +33,4 @@ class User(db.Model):
 def hello_world():
     return f"<p>Hello, World!</p>"
 
-# ----------------------------------------------------------------------
-#                               USERS
-# ----------------------------------------------------------------------
-@app.post("/user/signup/")
-def user_signup():
-    return {"areas": []}
 
-@app.post("/user/signin/")
-def user_signin():
-    return {"areas": []}
-
-
-
-
-# ----------------------------------------------------------------------
-#                           PARKING EVENTS
-# ----------------------------------------------------------------------
-# Signal a 'parking event' (from the App)
-# Incoming request payload must contain:
-#  - user id
-#  - gps coordinates
-#  - timestamp
-@app.post("/event/parking/")
-def parking_event():
-    return {"status": "success"}
-
-# Get all user 'parking events' (from the App)
-@app.get("/event/parking/<userId>")
-def get_user_parking_events():
-    return {"status": "success"}

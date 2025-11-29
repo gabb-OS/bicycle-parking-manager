@@ -10,10 +10,10 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /api
 
 # Install system dependencies
-# (libpq-dev is required for Postgres/PostGIS, gcc for compiling python libs)
+# (libpq is required for Postgres/PostGIS, gcc for compiling python libs)
 RUN apt-get update && apt-get install -y \
     gcc \
-    libpq-dev \
+    libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
 ENV FLASK_APP=flaskr

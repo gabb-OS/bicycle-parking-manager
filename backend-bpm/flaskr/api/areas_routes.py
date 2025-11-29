@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-areas_bp = Blueprint('Areas', __name__, url_prefix='/areas')
+areas_bp = Blueprint('areas', __name__, url_prefix='/areas')
 
 @areas_bp.route("/test", methods=["GET"])
 def say_hello():
