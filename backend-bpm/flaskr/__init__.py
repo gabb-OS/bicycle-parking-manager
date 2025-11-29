@@ -2,7 +2,7 @@ from flask import Flask
 from flaskr.config import Config
 from flaskr.database import db
 from flask_cors import CORS
-from app.modules import areas
+from flaskr.modules import areas
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -10,7 +10,7 @@ app = Flask(__name__)
 # Enable CORS
 CORS(app)
 
-app.register_blueprint(areas.blueprint)
+app.register_blueprint(areas.areas_bp)
 
 
 app.config.from_object(Config)

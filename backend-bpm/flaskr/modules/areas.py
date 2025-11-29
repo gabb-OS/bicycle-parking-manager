@@ -25,6 +25,6 @@ def get_past_parking_areas():
 # Return single parking area residualCapacity, aggregated for a certain time interval
 # !! For simplicity now we can consider a default 'monthly' aggregation
 # "areas/capacity/<id>/<aggrType>"
-@areas_bp.get("/capacity/<areaId>", methods=["GET"])
+@areas_bp.route("/capacity/<areaId>", methods=["GET"])
 def get_parking_areas_capacity_history():
     return {"areas": []}

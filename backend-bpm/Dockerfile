@@ -1,18 +1,34 @@
-FROM python:3.12
+# Use a slim version for smaller image size
+FROM python:3.12-slim
 
-RUN apt-get -q -y update 
-RUN apt-get install -y gcc
+# Set environment variables
+# PYTHONDONTWRITEBYTECODE: Prevents Python from writing pyc files to disc
+# PYTHONUNBUFFERED: Ensures logs are flushed immediately (helps debug)
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 WORKDIR /api
 
-COPY requirements.txt .
-COPY . .
-
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+# Install system dependencies
+# (libpq-dev is required for Postgres/PostGIS, gcc for compiling python libs)
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV FLASK_APP=flaskr
 
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the app
+COPY . .
+
+# Expose the port
 EXPOSE 4000
 
-CMD [ "flask", "run", "--host=0.0.0.0", "--port=4000" ]
+# We set the DEFAULT command to be the Production server (Gunicorn).
+# In Development, Docker Compose will ignore this line.
+CMD ["gunicorn", "--bind", "0.0.0.0:4000", "flaskr:app"]
