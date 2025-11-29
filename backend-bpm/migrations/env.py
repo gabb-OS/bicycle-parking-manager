@@ -14,6 +14,31 @@ config = context.config
 fileConfig(config.config_file_name)
 logger = logging.getLogger('alembic.env')
 
+def include_object(object, name, type_, reflected, compare_to):
+    """
+    Determines if a database object should be included in the migration.
+    We filter out PostGIS and Tiger Geocoder tables.
+    """
+    if type_ == "table" and name in [
+        # PostGIS System Tables
+        'spatial_ref_sys', 'geometry_columns', 'geography_columns', 
+        'raster_columns', 'raster_overviews',
+        
+        # Tiger Geocoder System & Lookup Tables
+        'place_lookup', 'layers', 'topology', 'zip_lookup', 'geocode_settings', 
+        'loader_lookups', 'loader_platform', 'loader_variables', 'pagc_gaz', 
+        'pagc_lex', 'pagc_rules', 'street_type_lookup', 'direction_lookup', 
+        'secondary_unit_lookup', 'state_lookup', 'county_lookup', 'countysub_lookup', 
+        'zip_lookup_base', 'zip_state', 'zip_state_loc',
+        
+        # Tiger Data Tables (The ones appearing in your bad migration)
+        'place', 'tract', 'county', 'featnames', 'bg', 'geocode_settings_default',
+        'tabblock20', 'zcta5', 'faces', 'edges', 'tabblock', 'addrfeat',
+        'loader_lookuptables', 'layer', 'cousub', 'state', 'addr', 'zip_lookup_all'
+    ]:
+        return False
+        
+    return True
 
 def get_engine():
     try:
@@ -100,6 +125,7 @@ def run_migrations_online():
         context.configure(
             connection=connection,
             target_metadata=get_metadata(),
+            include_object=include_object,
             **conf_args
         )
 
