@@ -23,6 +23,14 @@ class User(db.Model):
     def get_by_username(username):        
         db_user = User.query.filter(User.username == username).first()
         return db_user
+    
+    def to_dict(self):
+        """Converts the object to a dictionary for JSON responses."""
+        return {
+            "id": self.id,
+            "username": self.username,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
 
     def __repr__(self):
         return f"<User {self.username}>"

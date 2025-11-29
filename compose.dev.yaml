@@ -18,6 +18,7 @@ services:
   # Backend Development Overrides
   # =========================================
   backend:
+    entrypoint: []
     # "--debug" enables the interactive debugger and auto-reloader
     command: flask run --host=0.0.0.0 --port=4000 --debug
     volumes:
@@ -26,8 +27,7 @@ services:
     environment:
       - FLASK_APP=flaskr
       - FLASK_DEBUG=1
-      # Ensure your DB URL uses the service name "db", not localhost
-      - DB_URL=postgresql://postgres:postgres@db:5432/postgres
+      - DB_URL=postgresql+psycopg://postgres:postgres@db:5432/postgres
     networks:
       - bpm-network
 

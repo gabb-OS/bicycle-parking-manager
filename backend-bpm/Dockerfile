@@ -25,10 +25,15 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 # Copy the rest of the app
 COPY . .
+COPY entrypoint.sh /entrypoint.sh
+
+# Make it executable (Windows users often lose permission bits)
+RUN chmod +x /entrypoint.sh
 
 # Expose the port
 EXPOSE 4000
 
-# We set the DEFAULT command to be the Production server (Gunicorn).
-# In Development, Docker Compose will ignore this line.
+ENTRYPOINT ["/entrypoint.sh"]
+
+# This is the "default" argument passed to "$@" in the entrypoint
 CMD ["gunicorn", "--bind", "0.0.0.0:4000", "flaskr:app"]

@@ -2,7 +2,8 @@ from flask import Flask
 from flaskr.config import Config
 from flaskr.extensions import db, migrate
 from flask_cors import CORS
-from flaskr.models import areas, users
+from flaskr.api.users_routes import users_bp
+from flaskr.api.areas_routes import areas_bp
 from flaskr.models import areas as areas_model, users as users_model
 
 
@@ -12,8 +13,8 @@ app = Flask(__name__)
 # Enable CORS
 CORS(app)
 
-app.register_blueprint(areas.areas_bp)
-app.register_blueprint(users.users_bp)
+app.register_blueprint(areas_bp)
+app.register_blueprint(users_bp)
 
 
 app.config.from_object(Config)

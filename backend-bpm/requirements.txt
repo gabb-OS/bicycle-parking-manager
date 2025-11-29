@@ -1,5 +1,5 @@
 flask
-psycopg[binary,pool]
+psycopg[binary]
 python-dotenv
 Flask-SQLAlchemy
 SQLAlchemy
