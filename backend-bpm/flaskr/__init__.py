@@ -4,7 +4,8 @@ from flaskr.extensions import db, migrate
 from flask_cors import CORS
 from flaskr.api.users_routes import users_bp
 from flaskr.api.areas_routes import areas_bp
-from flaskr.models import parking_areas as areas_model, users as users_model
+from flaskr.api.events_routes import events_bp
+from flaskr.models import parking_areas as areas_model, users as users_model, events as events_model
 
 
 # Initialize Flask app
@@ -15,6 +16,7 @@ CORS(app)
 
 app.register_blueprint(areas_bp)
 app.register_blueprint(users_bp)
+app.register_blueprint(events_bp)
 
 
 app.config.from_object(Config)
