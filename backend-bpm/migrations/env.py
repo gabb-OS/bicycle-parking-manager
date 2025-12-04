@@ -4,6 +4,7 @@ from logging.config import fileConfig
 from flask import current_app
 
 from alembic import context
+from geoalchemy2 import alembic_helpers
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -14,31 +15,40 @@ config = context.config
 fileConfig(config.config_file_name)
 logger = logging.getLogger('alembic.env')
 
+# Tables to exclude from migrations
+EXCLUDED_TABLES = {
+    # PostGIS System Tables
+    'spatial_ref_sys', 'geometry_columns', 'geography_columns', 
+    'raster_columns', 'raster_overviews',
+    
+    # Tiger Geocoder System & Lookup Tables
+    'place_lookup', 'layers', 'topology', 'zip_lookup', 'geocode_settings', 
+    'loader_lookups', 'loader_platform', 'loader_variables', 'pagc_gaz', 
+    'pagc_lex', 'pagc_rules', 'street_type_lookup', 'direction_lookup', 
+    'secondary_unit_lookup', 'state_lookup', 'county_lookup', 'countysub_lookup', 
+    'zip_lookup_base', 'zip_state', 'zip_state_loc',
+    
+    # Tiger Data Tables
+    'place', 'tract', 'county', 'featnames', 'bg', 'geocode_settings_default',
+    'tabblock20', 'zcta5', 'faces', 'edges', 'tabblock', 'addrfeat',
+    'loader_lookuptables', 'layer', 'cousub', 'state', 'addr', 'zip_lookup_all'
+}
+
 def include_object(object, name, type_, reflected, compare_to):
     """
     Determines if a database object should be included in the migration.
-    We filter out PostGIS and Tiger Geocoder tables.
+    Combines custom filtering with GeoAlchemy2's include_object helper.
     """
-    if type_ == "table" and name in [
-        # PostGIS System Tables
-        'spatial_ref_sys', 'geometry_columns', 'geography_columns', 
-        'raster_columns', 'raster_overviews',
-        
-        # Tiger Geocoder System & Lookup Tables
-        'place_lookup', 'layers', 'topology', 'zip_lookup', 'geocode_settings', 
-        'loader_lookups', 'loader_platform', 'loader_variables', 'pagc_gaz', 
-        'pagc_lex', 'pagc_rules', 'street_type_lookup', 'direction_lookup', 
-        'secondary_unit_lookup', 'state_lookup', 'county_lookup', 'countysub_lookup', 
-        'zip_lookup_base', 'zip_state', 'zip_state_loc',
-        
-        # Tiger Data Tables (The ones appearing in your bad migration)
-        'place', 'tract', 'county', 'featnames', 'bg', 'geocode_settings_default',
-        'tabblock20', 'zcta5', 'faces', 'edges', 'tabblock', 'addrfeat',
-        'loader_lookuptables', 'layer', 'cousub', 'state', 'addr', 'zip_lookup_all'
-    ]:
+    # First, apply GeoAlchemy2's filter
+    if not alembic_helpers.include_object(object, name, type_, reflected, compare_to):
+        return False
+    
+    # Then, apply our custom PostGIS/Tiger table filter
+    if type_ == "table" and name in EXCLUDED_TABLES:
         return False
         
     return True
+
 
 def get_engine():
     try:
@@ -64,11 +74,6 @@ def get_engine_url():
 config.set_main_option('sqlalchemy.url', get_engine_url())
 target_db = current_app.extensions['migrate'].db
 
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
-
 
 def get_metadata():
     if hasattr(target_db, 'metadatas'):
@@ -77,20 +82,15 @@ def get_metadata():
 
 
 def run_migrations_offline():
-    """Run migrations in 'offline' mode.
-
-    This configures the context with just a URL
-    and not an Engine, though an Engine is acceptable
-    here as well.  By skipping the Engine creation
-    we don't even need a DBAPI to be available.
-
-    Calls to context.execute() here emit the given string to the
-    script output.
-
-    """
+    """Run migrations in 'offline' mode."""
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=url, target_metadata=get_metadata(), literal_binds=True
+        url=url,
+        target_metadata=get_metadata(),
+        literal_binds=True,
+        include_object=include_object,
+        process_revision_directives=alembic_helpers.writer,
+        render_item=alembic_helpers.render_item,
     )
 
     with context.begin_transaction():
@@ -98,26 +98,16 @@ def run_migrations_offline():
 
 
 def run_migrations_online():
-    """Run migrations in 'online' mode.
+    """Run migrations in 'online' mode."""
 
-    In this scenario we need to create an Engine
-    and associate a connection with the context.
-
-    """
-
-    # this callback is used to prevent an auto-migration from being generated
-    # when there are no changes to the schema
-    # reference: http://alembic.zzzcomputing.com/en/latest/cookbook.html
     def process_revision_directives(context, revision, directives):
         if getattr(config.cmd_opts, 'autogenerate', False):
             script = directives[0]
             if script.upgrade_ops.is_empty():
                 directives[:] = []
                 logger.info('No changes in schema detected.')
-
-    conf_args = current_app.extensions['migrate'].configure_args
-    if conf_args.get("process_revision_directives") is None:
-        conf_args["process_revision_directives"] = process_revision_directives
+        # Call GeoAlchemy2's writer
+        alembic_helpers.writer(context, revision, directives)
 
     connectable = get_engine()
 
@@ -126,7 +116,8 @@ def run_migrations_online():
             connection=connection,
             target_metadata=get_metadata(),
             include_object=include_object,
-            **conf_args
+            process_revision_directives=process_revision_directives,
+            render_item=alembic_helpers.render_item,
         )
 
         with context.begin_transaction():
