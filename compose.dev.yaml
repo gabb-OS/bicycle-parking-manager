@@ -1,33 +1,70 @@
 services:
+  # =========================================
+  # Frontend Development Overrides
+  # =========================================
   frontend:
-    image: frontend-bpm-image-dev
-    container_name: frontend-bpm-dev
     build:
       context: ./frontend-bpm
       dockerfile: Dockerfile.dev
-    # Il Bind Mount è necessario per lo sviluppo Angular:
-    # 1. Rende il codice sorgente locale immediatamente disponibile nel container (/app è il WORKDIR).
-    # 2. Risolve i problemi di hot reload (Live Reload / HMR) con Webpack/Angular CLI su macOS/Windows,
-    #    dove il file watcher nativo del container non riceve le notifiche di cambio file dall'host.
     volumes:
+      # Sync local source code to container for Hot Reload
       - ./frontend-bpm:/app
+      # Anonymous volume: Prevents local empty folder from overwriting container's node_modules
+      - /app/node_modules
+    networks:
+      - bpm-network
 
+  # =========================================
+  # Backend Development Overrides
+  # =========================================
+  backend:
+    entrypoint: []
+    # "--debug" enables the interactive debugger and auto-reloader
+    command: flask run --host=0.0.0.0 --port=4000 --debug
+    volumes:
+      # Sync local python files to container for auto-reload
+      - ./backend-bpm:/api
+    environment:
+      - FLASK_APP=flaskr
+      - FLASK_DEBUG=1
+      - DB_URL=postgresql+psycopg://postgres:postgres@db:5432/postgres
+    networks:
+      - bpm-network
+
+  # =========================================
+  # Database Access (Expose Port)
+  # =========================================
+  db:
+    ports:
+      # Expose 5432 locally so you can connect via DBeaver/TablePlus
+      - "5432:5432"
+    networks:
+      - bpm-network
+
+  # =========================================
+  # pgAdmin Tool
+  # =========================================
   pgadmin:
     image: dpage/pgadmin4
-    container_name: pgadmin
+    container_name: pgadmin_dev
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      # Disable the extra security prompt for dev convenience
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
     ports:
-      - "15432:80"    # Keep port :80 inside container as per pgadmin official documentation
+      - "15432:80"
     volumes:
-      - pgadmin-data:/var/lib/pgadmin
+      # PERSISTENCE: This ensures your server configs aren't lost on restart
+      - pgadmin-data-dev:/var/lib/pgadmin
     depends_on:
       db:
-        condition: service_healthy
-    restart: unless-stopped
+        condition: service_started
+    networks:
+      - bpm-network
 
+# =========================================
+# Volumes
+# =========================================
 volumes:
-  pgadmin-data: {}
+  pgadmin-data-dev: {}
