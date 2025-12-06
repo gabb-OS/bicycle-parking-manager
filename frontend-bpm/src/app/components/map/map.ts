@@ -57,8 +57,8 @@ private bicycleParkingData = {
   private map: Map | undefined;
 
   private view = new View({
-    center: fromLonLat([11.3387500, 44.4938100]),
-    zoom: 14
+    center: fromLonLat([11.355432, 44.498089]),
+    zoom: 17
   });
 
   private osmLayer = new TileLayer({
