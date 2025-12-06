@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
-import { NgbDatepicker, NgbDropdownModule } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'app-filtersbar',
-  imports: [NgbDropdownModule],
+  imports: [],
   templateUrl: './filtersbar.html',
   styleUrl: './filtersbar.css',
 })
