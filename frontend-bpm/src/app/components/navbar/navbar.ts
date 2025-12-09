@@ -1,11 +1,10 @@
 import { Component, HostListener } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterModule, NgbCollapseModule],
+  imports: [RouterModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
