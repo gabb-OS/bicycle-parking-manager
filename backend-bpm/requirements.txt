@@ -7,3 +7,4 @@ GeoAlchemy2
 Flask-Migrate
 flask-cors
 gunicorn
+shapely
