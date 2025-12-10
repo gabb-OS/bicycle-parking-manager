@@ -4,7 +4,7 @@
     {
       "type": "Feature",
       "properties": {
-        "id": 1001,
+        "id": 1,
         "name": "Filippo Re - Dip. Fisiologia",
         "max_capacity": 50,
         "residual_capacity": 50
@@ -36,7 +36,7 @@
     {
       "type": "Feature",
       "properties": {
-        "id": 1002,
+        "id": 2,
         "name": "Irnerio - Dip. Farmacia",
         "max_capacity": 40,
         "residual_capacity": 40
@@ -72,7 +72,7 @@
     {
       "type": "Feature",
       "properties": {
-        "id": 1003,
+        "id": 3,
         "name": "Filippo Re - Dip. Farmacia",
         "max_capacity": 10,
         "residual_capacity": 10
@@ -108,7 +108,7 @@
     {
       "type": "Feature",
       "properties": {
-        "id": 1004,
+        "id": 4,
         "name": "Irnerio - Dip. Fisica",
         "max_capacity": 20,
         "residual_capacity": 20
@@ -144,7 +144,7 @@
     {
       "type": "Feature",
       "properties": {
-        "id": 1005,
+        "id": 5,
         "name": "Puntoni",
         "max_capacity": 10,
         "residual_capacity": 10
@@ -188,7 +188,7 @@
     {
       "type": "Feature",
       "properties": {
-        "id": 1006,
+        "id": 6,
         "name": "Scaravilli - Dip. Economia",
         "max_capacity": 20,
         "residual_capacity": 20
@@ -220,7 +220,7 @@
     {
       "type": "Feature",
       "properties": {
-        "id": 1007,
+        "id": 7,
         "name": "Berti Pichat",
         "max_capacity": 60,
         "residual_capacity": 60
@@ -256,7 +256,7 @@
     {
       "type": "Feature",
       "properties": {
-        "id": 1008,
+        "id": 8,
         "name": "Mura Anteo Zamboni - Dip. Informatica",
         "max_capacity": 20,
         "residual_capacity": 20
@@ -292,7 +292,7 @@
     {
       "type": "Feature",
       "properties": {
-        "id": 1009,
+        "id": 9,
         "name": "San Giacomo",
         "max_capacity": 5,
         "residual_capacity": 5
@@ -328,7 +328,7 @@
     {
       "type": "Feature",
       "properties": {
-        "id": 1010,
+        "id": 10,
         "name": "Mura Anteo Zamboni - Dip. Biochimica",
         "max_capacity": 20,
         "residual_capacity": 20
