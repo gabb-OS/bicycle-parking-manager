@@ -6,8 +6,8 @@
       "properties": {
         "id": 1001,
         "name": "Filippo Re - Dip. Fisiologia",
-        "maxCapacity": 50,
-        "residualCapacity": 50
+        "max_capacity": 50,
+        "residual_capacity": 50
       },
       "geometry": {
         "type": "Polygon",
@@ -38,8 +38,8 @@
       "properties": {
         "id": 1002,
         "name": "Irnerio - Dip. Farmacia",
-        "maxCapacity": 40,
-        "residualCapacity": 40
+        "max_capacity": 40,
+        "residual_capacity": 40
       },
       "geometry": {
         "type": "Polygon",
@@ -74,8 +74,8 @@
       "properties": {
         "id": 1003,
         "name": "Filippo Re - Dip. Farmacia",
-        "maxCapacity": 10,
-        "residualCapacity": 10
+        "max_capacity": 10,
+        "residual_capacity": 10
       },
       "geometry": {
         "type": "Polygon",
@@ -110,8 +110,8 @@
       "properties": {
         "id": 1004,
         "name": "Irnerio - Dip. Fisica",
-        "maxCapacity": 20,
-        "residualCapacity": 20
+        "max_capacity": 20,
+        "residual_capacity": 20
       },
       "geometry": {
         "type": "Polygon",
@@ -146,8 +146,8 @@
       "properties": {
         "id": 1005,
         "name": "Puntoni",
-        "maxCapacity": 10,
-        "residualCapacity": 10
+        "max_capacity": 10,
+        "residual_capacity": 10
       },
       "geometry": {
         "type": "Polygon",
@@ -190,8 +190,8 @@
       "properties": {
         "id": 1006,
         "name": "Scaravilli - Dip. Economia",
-        "maxCapacity": 20,
-        "residualCapacity": 20
+        "max_capacity": 20,
+        "residual_capacity": 20
       },
       "geometry": {
         "type": "Polygon",
@@ -222,8 +222,8 @@
       "properties": {
         "id": 1007,
         "name": "Berti Pichat",
-        "maxCapacity": 60,
-        "residualCapacity": 60
+        "max_capacity": 60,
+        "residual_capacity": 60
       },
       "geometry": {
         "type": "Polygon",
@@ -258,8 +258,8 @@
       "properties": {
         "id": 1008,
         "name": "Mura Anteo Zamboni - Dip. Informatica",
-        "maxCapacity": 20,
-        "residualCapacity": 20
+        "max_capacity": 20,
+        "residual_capacity": 20
       },
       "geometry": {
         "type": "Polygon",
@@ -294,8 +294,8 @@
       "properties": {
         "id": 1009,
         "name": "San Giacomo",
-        "maxCapacity": 5,
-        "residualCapacity": 5
+        "max_capacity": 5,
+        "residual_capacity": 5
       },
       "geometry": {
         "type": "Polygon",
@@ -330,8 +330,8 @@
       "properties": {
         "id": 1010,
         "name": "Mura Anteo Zamboni - Dip. Biochimica",
-        "maxCapacity": 20,
-        "residualCapacity": 20
+        "max_capacity": 20,
+        "residual_capacity": 20
       },
       "geometry": {
         "type": "Polygon",

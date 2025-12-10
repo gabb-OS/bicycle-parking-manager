@@ -18,7 +18,7 @@ services:
   # Backend Development Overrides
   # =========================================
   backend:
-    entrypoint: []
+    # entrypoint: []
     # "--debug" enables the interactive debugger and auto-reloader
     command: flask run --host=0.0.0.0 --port=4000 --debug
     volumes:
