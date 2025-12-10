@@ -60,7 +60,7 @@ def parking_event():
         location_point=location_point,
         user_id=data['user_id'],
         parking_area_id=parking_area.id,
-        timestamp=data.get('timestamp')  # Optional, defaults to now
+        start_time=data.get('start_time')  # Optional, defaults to now
     )
     
     db.session.add(event)

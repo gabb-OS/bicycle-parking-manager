@@ -15,7 +15,8 @@ class ParkingEvent(db.Model):
     __tablename__ = 'parking_events'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    end_time = db.Column(db.DateTime, nullable=True)
     type = db.Column(db.Enum(EventType), nullable=False)
     location_point = db.Column(Geometry(geometry_type='POINT', srid=4326), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -25,12 +26,13 @@ class ParkingEvent(db.Model):
     user = db.relationship('User', backref=db.backref('parking_events', lazy='dynamic'))
     parking_area = db.relationship('ParkingArea', backref=db.backref('parking_events', lazy='dynamic'))
 
-    def __init__(self, type, location_point, user_id, parking_area_id, timestamp=None):
+    def __init__(self, type, location_point, user_id, parking_area_id, start_time=None, end_time=None):
         self.type = type
         self.location_point = location_point
         self.user_id = user_id
         self.parking_area_id = parking_area_id
-        self.timestamp = timestamp if timestamp is not None else datetime.utcnow()
+        self.start_time = start_time if start_time is not None else datetime.utcnow()
+        self.end_time = end_time
 
     def get_location_geojson(self):
         """Converts the geometry to GeoJSON dict."""
@@ -61,13 +63,14 @@ class ParkingEvent(db.Model):
 
     @staticmethod
     def get_recent(limit=10):
-        return ParkingEvent.query.order_by(ParkingEvent.timestamp.desc()).limit(limit).all()
+        return ParkingEvent.query.order_by(ParkingEvent.start_time.desc()).limit(limit).all()
 
     def to_dict(self):
         """Converts the object to a dictionary for JSON responses."""
         return {
             "id": self.id,
-            "timestamp": self.timestamp.isoformat(),
+            "start_time": self.start_time.isoformat(),
+            "end_time": self.end_time.isoformat() if self.end_time else None,
             "type": self.type.value,
             "location_point": self.get_location_geojson(),
             "user_id": self.user_id,
@@ -81,7 +84,8 @@ class ParkingEvent(db.Model):
             "geometry": self.get_location_geojson(),
             "properties": {
                 "id": self.id,
-                "timestamp": self.timestamp.isoformat(),
+                "start_time": self.start_time.isoformat(),
+                "end_time": self.end_time.isoformat() if self.end_time else None,
                 "type": self.type.value,
                 "user_id": self.user_id,
                 "parking_area_id": self.parking_area_id
@@ -89,4 +93,4 @@ class ParkingEvent(db.Model):
         }
 
     def __repr__(self):
-        return f"<ParkingEvent {self.id} - {self.type.value} at {self.timestamp}>"
+        return f"<ParkingEvent {self.id} - {self.type.value} at {self.start_time}>"
