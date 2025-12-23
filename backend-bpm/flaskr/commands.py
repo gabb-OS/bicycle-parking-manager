@@ -118,7 +118,6 @@ def seed_parking_areas():
 
         # 4. Create Model Instance
         new_area = ParkingArea(
-            id=area_id,
             name=name,
             location_area=wkt_geom,
             max_capacity=max_cap,
