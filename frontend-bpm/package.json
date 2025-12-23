@@ -29,6 +29,7 @@
     "@angular/platform-browser": "^21.0.3",
     "@angular/router": "^21.0.3",
     "@popperjs/core": "^2.11.8",
+    "@types/geojson": "^7946.0.16",
     "bootstrap": "^5.3.6",
     "echarts": "^6.0.0",
     "ngx-echarts": "^21.0.0",
