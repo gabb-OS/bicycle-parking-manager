@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { MapComponent } from '../../components/map/map';
-import { Filtersbar } from "../../components/filtersbar/filtersbar";
-import { LineChartComponent } from '../../components/line-chart/line-chart';
+import { MapComponent } from '@components/map/map';
+import { Filtersbar } from "@components/filtersbar/filtersbar";
+import { LineChartComponent } from '@components/line-chart/line-chart';
 
 @Component({
   selector: 'app-home',

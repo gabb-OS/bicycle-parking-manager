@@ -12,10 +12,10 @@ import Icon from 'ol/style/Icon';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
 import { Subject, take, takeUntil } from 'rxjs';
-import { ParkinAreasService } from '../../services/parking-areas.service';
-import { ParkingAreasGeoJSON } from '../../types/parking-area';
-import { ParkingEventsService } from '../../services/parking-events.service';
-import { ParkingEventsGeoJSON } from '../../types/parking-event';
+import { ParkinAreasService } from '../../core/services/parking-areas.service';
+import { ParkingAreasGeoJSON } from '../../core/types/parking-area';
+import { ParkingEventsService } from '../../core/services/parking-events.service';
+import { ParkingEventsGeoJSON } from '../../core/types/parking-event';
 
 
 /*TODO: on marker click, show popup OR open side window*/
