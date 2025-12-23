@@ -55,16 +55,33 @@ export class MapComponent implements OnInit, OnDestroy {
     })
   });
 
-  // Style for geometry: Polygon
-  private polygonStyle = new Style({
-    stroke: new Stroke({
-      color: 'rgba(255, 0, 0, 0.8)',
-      width: 2,
-    }),
-    fill: new Fill({
-      color: 'rgba(78, 16, 16, 0.2)',
-    }),
-  });
+  // Calculate color based on capacity (green = free, red = full)
+  private getCapacityColor(residualCapacity: number, maxCapacity: number): string {
+    if (maxCapacity === 0) return 'rgba(128, 128, 128, 0.8)'; // Gray for invalid capacity
+
+    const occupancyRatio = 1 - (residualCapacity / maxCapacity);
+    const clampedRatio = Math.max(0, Math.min(1, occupancyRatio));
+
+    // Interpolate from green (0, 255, 0) to red (255, 0, 0)
+    const red = Math.round(255 * clampedRatio);
+    const green = Math.round(255 * (1 - clampedRatio));
+
+    return `rgba(${red}, ${green}, 0, 0.8)`;
+  }
+
+  // Create polygon style based on capacity
+  private createPolygonStyle(residualCapacity: number, maxCapacity: number): Style {
+    const color = this.getCapacityColor(residualCapacity, maxCapacity);
+    return new Style({
+      stroke: new Stroke({
+        color: color,
+        width: 2,
+      }),
+      fill: new Fill({
+        color: color.replace('0.8', '0.2'), // Use same color with lower opacity for fill
+      }),
+    });
+  }
 
   // Select style function
   private styleFunction = (feature: any) => {
@@ -72,7 +89,10 @@ export class MapComponent implements OnInit, OnDestroy {
     if (geometryType === 'Point') {
       return this.pointStyle;
     } else if (geometryType === 'Polygon') {
-      return this.polygonStyle;
+      const properties = feature.getProperties();
+      const residualCapacity = properties.residual_capacity ?? 0;
+      const maxCapacity = properties.max_capacity ?? 1;
+      return this.createPolygonStyle(residualCapacity, maxCapacity);
     }
     console.error('Unsupported geometry type:', geometryType);
     return undefined;

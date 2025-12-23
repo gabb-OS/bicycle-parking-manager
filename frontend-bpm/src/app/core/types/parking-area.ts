@@ -6,7 +6,6 @@ export interface ParkingAreaProperties {
   name: string;
   max_capacity: number;
   residual_capacity: number;
-  occupancy_percentage: number;
 }
 
 // Type aliases using standard GeoJSON types
