@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, effect, input, OnDestroy, OnInit } from '@angular/core';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import TileLayer from 'ol/layer/Tile';
@@ -11,10 +11,7 @@ import Style from 'ol/style/Style';
 import Icon from 'ol/style/Icon';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
-import { Subject, take, takeUntil } from 'rxjs';
-import { ParkinAreasService } from '@core/services/parking-areas.service';
 import { ParkingAreasGeoJSON } from '@core/types/parking-area';
-import { ParkingEventsService } from '@core/services/parking-events.service';
 import { ParkingEventsGeoJSON } from '@core/types/parking-event';
 import { getCapacityColor } from './utils/utils';
 
@@ -52,15 +49,46 @@ import { getCapacityColor } from './utils/utils';
 })
 export class MapComponent implements OnInit, OnDestroy {
   /**
-   * Subject used for cleaning up subscriptions when the component is destroyed.
-   * All subscriptions should use takeUntil(destroy$) to prevent memory leaks.
+   * Input signal for parking areas GeoJSON data.
+   * Receives data from parent component.
    */
-  private destroy$ = new Subject<void>();
+  parkingAreas = input<ParkingAreasGeoJSON | null>(null);
 
-  constructor(
-    private parkingAreasService: ParkinAreasService,
-    private parkingEventsService: ParkingEventsService
-  ) {}
+  /**
+   * Input signal for parking events GeoJSON data.
+   * Receives data from parent component.
+   */
+  parkingEvents = input<ParkingEventsGeoJSON | null>(null);
+
+  constructor() {
+    // Effect to update parking areas layer when input changes
+    effect(() => {
+      const areas = this.parkingAreas();
+      if (areas && this.parkingAreasLayer) {
+        console.log('Received parking areas update:', areas);
+        const features = new GeoJSON().readFeatures(areas, {
+          dataProjection: 'EPSG:4326',
+          featureProjection: 'EPSG:3857'
+        });
+        this.parkingAreasLayer.getSource()?.clear();
+        this.parkingAreasLayer.getSource()?.addFeatures(features);
+      }
+    });
+
+    // Effect to update parking events layer when input changes
+    effect(() => {
+      const events = this.parkingEvents();
+      if (events && this.parkingEventsLayer) {
+        console.log('Received parking events update:', events);
+        const features = new GeoJSON().readFeatures(events, {
+          dataProjection: 'EPSG:4326',
+          featureProjection: 'EPSG:3857'
+        });
+        this.parkingEventsLayer.getSource()?.clear();
+        this.parkingEventsLayer.getSource()?.addFeatures(features);
+      }
+    });
+  }
 
   private map: Map | undefined;
 
@@ -164,28 +192,8 @@ export class MapComponent implements OnInit, OnDestroy {
    * Component initialization lifecycle hook.
    *
    * @description
-   * Performs the following initialization steps:
-   *
-   * 1. Creates OpenLayers Map instance with base OSM layer and two vector layers
-   * 2. Sets up reactive subscriptions to both parking services
-   * 3. Triggers initial data fetch from both services
-   *
-   * Subscription Flow:
-   * - Subscribes to parkingAreasService.parkingAreas$ Observable
-   * - Subscribes to parkingEventsService.parkingEvents$ Observable
-   * - Both use takeUntil(destroy$) for automatic cleanup on component destruction
-   *
-   * Data Processing:
-   * When data is received from either service:
-   * 1. Converts GeoJSON data to OpenLayers features using the GeoJSON format reader
-   * 2. Handles coordinate transformation from EPSG:4326 to EPSG:3857
-   * 3. Clears existing features from the layer
-   * 4. Adds new features to the layer
-   * 5. Map automatically re-renders with updated features
-   *
-   * Initial Data Fetch:
-   * Uses take(1) to fetch initial data without keeping the HTTP subscription open.
-   * The data is broadcast through the services' BehaviorSubjects to all subscribers.
+   * Creates the OpenLayers Map instance with base OSM layer and two vector layers.
+   * Data updates are handled reactively via effects that respond to input signal changes.
    */
   ngOnInit() {
     this.map = new Map({
@@ -193,59 +201,12 @@ export class MapComponent implements OnInit, OnDestroy {
       view: this.view,
       layers: [this.osmLayer, this.parkingAreasLayer, this.parkingEventsLayer]
     });
-
-    // Subscribe to parking areas updates from the service
-    // Automatically receives new data whenever parkingAreasService emits updates
-    this.parkingAreasService.parkingAreas$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((parkingAreas: ParkingAreasGeoJSON | null) => {
-        console.log('Received parking areas update:', parkingAreas);
-        if (parkingAreas) {
-          // Convert GeoJSON to OpenLayers features with coordinate transformation
-          const features = new GeoJSON().readFeatures(parkingAreas, {
-            dataProjection: 'EPSG:4326',    // Input: WGS84 (lat/lon)
-            featureProjection: 'EPSG:3857' // Output: Web Mercator (map projection)
-          });
-          // Update layer with new features
-          this.parkingAreasLayer.getSource()?.clear();
-          this.parkingAreasLayer.getSource()?.addFeatures(features);
-        }
-      });
-
-    // Subscribe to parking events updates from the service
-    // Automatically receives new data whenever parkingEventsService emits updates
-    this.parkingEventsService.parkingEvents$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((parkingEvents: ParkingEventsGeoJSON | null) => {
-        console.log('Received parking events update:', parkingEvents);
-        if (parkingEvents) {
-          // Convert GeoJSON to OpenLayers features with coordinate transformation
-          const features = new GeoJSON().readFeatures(parkingEvents, {
-            dataProjection: 'EPSG:4326',    // Input: WGS84 (lat/lon)
-            featureProjection: 'EPSG:3857' // Output: Web Mercator (map projection)
-          });
-          // Update layer with new features
-          this.parkingEventsLayer.getSource()?.clear();
-          this.parkingEventsLayer.getSource()?.addFeatures(features);
-        }
-      });
-
-    // Trigger initial data fetch for both services
-    // take(1) ensures the HTTP subscription completes after receiving the response
-    // The services' BehaviorSubjects broadcast the data to all subscribers
-    this.parkingAreasService.getParkingAreasGEOJSON().pipe(take(1)).subscribe();
-    this.parkingEventsService.getParkingEventsGEOJSON().pipe(take(1)).subscribe();
   }
 
   /**
    * Component cleanup lifecycle hook.
-   *
-   * @description
-   * Properly unsubscribes from all reactive subscriptions to prevent memory leaks.
-   * Emits a value through destroy$ which triggers takeUntil() to complete all subscriptions.
    */
   ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    // Effects are automatically cleaned up by Angular
   }
 }
