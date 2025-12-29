@@ -42,6 +42,9 @@ export class Home implements OnInit, OnDestroy {
   // Signal to hold the chart data for the line chart
   chartData = signal<ChartData | null>(null);
 
+  // Signal to hold the currently selected parking area ID for map highlighting
+  selectedAreaId = signal<number | null>(null);
+
   ngOnInit(): void {
     // Subscribe to parking areas updates
     this.parkingAreasService.parkingAreasGeoJSON$
@@ -72,21 +75,23 @@ export class Home implements OnInit, OnDestroy {
 
   /**
    * Handles the filters applied event from the filtersbar component.
-   * Updates the appliedFilters signal and computes chart data.
+   * Updates the appliedFilters signal, selected area, and computes chart data.
    *
    * @param filters - The filter values emitted by the filtersbar
    */
   onFiltersApplied(filters: FiltersValue): void {
     this.appliedFilters.set(filters);
+    this.selectedAreaId.set(filters.zone);
     this.computeChartData(filters);
   }
 
   /**
    * Handles the filters reset event from the filtersbar component.
-   * Clears the appliedFilters signal and chart data.
+   * Clears the appliedFilters signal, selected area, and chart data.
    */
   onFiltersReset(): void {
     this.appliedFilters.set(null);
+    this.selectedAreaId.set(null);
     this.chartData.set(null);
   }
 

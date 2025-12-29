@@ -60,6 +60,12 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   parkingEvents = input<ParkingEventsGeoJSON | null>(null);
 
+  /**
+   * Input signal for the currently selected parking area ID.
+   * When set, the selected area will be highlighted in blue on the map.
+   */
+  selectedAreaId = input<number | null>(null);
+
   constructor() {
     // Effect to update parking areas layer when input changes
     effect(() => {
@@ -84,6 +90,15 @@ export class MapComponent implements OnInit, OnDestroy {
         });
         this.parkingEventsLayer.getSource()?.clear();
         this.parkingEventsLayer.getSource()?.addFeatures(features);
+      }
+    });
+
+    // Effect to refresh parking areas layer styling when selected area changes
+    effect(() => {
+      const selectedId = this.selectedAreaId();
+      // Trigger a style refresh by updating the layer
+      if (this.parkingAreasLayer) {
+        this.parkingAreasLayer.changed();
       }
     });
   }
@@ -120,14 +135,27 @@ export class MapComponent implements OnInit, OnDestroy {
    *
    * @param residualCapacity - Number of free parking spots remaining
    * @param maxCapacity - Total number of parking spots in the area
+   * @param isSelected - Whether the area is currently selected
    * @returns OpenLayers Style object for rendering the polygon
    *
    * @description
    * Generates a Style with both stroke and fill, where:
-   * - Stroke: Uses the capacity color at 80% opacity
-   * - Fill: Uses the same color at 20% opacity for better visibility
+   * - If selected: Blue color for stroke (80% opacity) and fill (30% opacity)
+   * - If not selected: Uses the capacity color at 80% opacity for stroke, 20% for fill
    */
-  private createPolygonStyle(residualCapacity: number, maxCapacity: number): Style {
+  private createPolygonStyle(residualCapacity: number, maxCapacity: number, isSelected: boolean): Style {
+    if (isSelected) {
+      return new Style({
+        stroke: new Stroke({
+          color: MapUtils.SELECTED_AREA_COLOR,
+          width: 3,
+        }),
+        fill: new Fill({
+          color: MapUtils.SELECTED_AREA_FILL_COLOR,
+        }),
+      });
+    }
+
     const color = MapUtils.getCapacityColor(residualCapacity, maxCapacity);
     return new Style({
       stroke: new Stroke({
@@ -149,10 +177,11 @@ export class MapComponent implements OnInit, OnDestroy {
    * @description
    * Applies different styles based on feature geometry:
    * - Point: Uses bicycle icon style (for parking events)
-   * - Polygon: Uses capacity-based color style (for parking areas)
+   * - Polygon: Uses capacity-based color style (for parking areas), or blue if selected
    *
    * For polygons, extracts residual_capacity and max_capacity properties
-   * to determine the appropriate color coding.
+   * to determine the appropriate color coding. If the area ID matches
+   * the selectedAreaId, it will be highlighted in blue.
    */
   private styleFunction = (feature: any) => {
     const geometryType = feature.getGeometry().getType();
@@ -160,9 +189,11 @@ export class MapComponent implements OnInit, OnDestroy {
       return this.pointStyle;
     } else if (geometryType === 'Polygon') {
       const properties = feature.getProperties();
+      const areaId = properties.id;
       const residualCapacity = properties.residual_capacity ?? 0;
       const maxCapacity = properties.max_capacity ?? 1;
-      return this.createPolygonStyle(residualCapacity, maxCapacity);
+      const isSelected = areaId === this.selectedAreaId();
+      return this.createPolygonStyle(residualCapacity, maxCapacity, isSelected);
     }
     console.error('Unsupported geometry type:', geometryType);
     return undefined;

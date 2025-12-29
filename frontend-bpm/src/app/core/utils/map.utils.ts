@@ -1,6 +1,12 @@
 export class MapUtils {
 
   /**
+   * The color used for highlighting selected parking areas.
+   */
+  static readonly SELECTED_AREA_COLOR = 'rgba(0, 120, 255, 0.8)';
+  static readonly SELECTED_AREA_FILL_COLOR = 'rgba(0, 120, 255, 0.3)';
+
+  /**
    * Calculates the color for a parking area based on its occupancy ratio.
    *
    * @param residualCapacity - Number of free parking spots remaining
