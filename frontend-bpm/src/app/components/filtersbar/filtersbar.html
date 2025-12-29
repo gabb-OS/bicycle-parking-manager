@@ -34,6 +34,14 @@
         </div>
     </div>
 
+    @if (filtersForm.hasError('dateRangeInvalid')) {
+        <div class="row">
+            <div class="col">
+                <small class="text-danger">La data di inizio non può essere successiva alla data di fine.</small>
+            </div>
+        </div>
+    }
+
     <div class="row my-3">
         <div class="col">
             <button type="submit" class="btn btn-primary w-100" [disabled]="!filtersForm.valid">Applica Filtri</button>

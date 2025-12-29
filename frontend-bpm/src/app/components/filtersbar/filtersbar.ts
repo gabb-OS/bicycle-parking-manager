@@ -1,7 +1,20 @@
 import { Component, inject, input, output } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ParkingArea } from '@core/types/parking-area';
 import { FiltersValue } from '@core/types/filters';
+
+/**
+ * Validator to avoid a startDate that is after the endDate .
+ */
+function dateRangeValidator(control: AbstractControl): ValidationErrors | null {
+  const startDate = control.get('startDate')?.value;
+  const endDate = control.get('endDate')?.value;
+
+  if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+    return { dateRangeInvalid: true };
+  }
+  return null;
+}
 
 @Component({
   selector: 'app-filtersbar',
@@ -34,7 +47,7 @@ export class Filtersbar {
     zone: [null as number | null, Validators.required],
     startDate: ['', Validators.required],
     endDate: ['', Validators.required],
-  });
+  }, { validators: dateRangeValidator });
 
   /**
    * Handles form submission and emits the filter values to the parent component.
