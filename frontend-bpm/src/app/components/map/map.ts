@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, effect, input, OnDestroy, OnInit } from '@angular/core';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import TileLayer from 'ol/layer/Tile';
@@ -11,7 +11,32 @@ import Style from 'ol/style/Style';
 import Icon from 'ol/style/Icon';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
+import { ParkingAreasGeoJSON } from '@core/types/parking-area';
+import { ParkingEventsGeoJSON } from '@core/types/parking-event';
+import { MapUtils } from '@core/utils/map.utils';
 
+/**
+ * Map component for visualizing bicycle parking areas and events.
+ *
+ * @description
+ * This component integrates OpenLayers to display an interactive map with two main layers:
+ * 1. Parking Areas Layer - Shows designated parking zones as colored polygons
+ * 2. Parking Events Layer - Shows individual parked bicycles as point markers
+ *
+ * Service Integration:
+ * The component subscribes to two reactive services that manage data flow:
+ * - ParkinAreasService.parkingAreas$ - Provides parking area polygons with capacity information
+ * - ParkingEventsService.parkingEvents$ - Provides individual parking event points
+ *
+ * Data Flow:
+ * 1. Component initializes and subscribes to both services' Observables
+ * 2. Initial data fetch is triggered using take(1) to get current state
+ * 3. Services emit GeoJSON data through BehaviorSubjects
+ * 4. Component receives updates and converts GeoJSON to OpenLayers features
+ * 5. Features are added to their respective layers on the map
+ * 6. Map automatically re-renders with the new features
+ *
+ */
 
 /*TODO: on marker click, show popup OR open side window*/
 
@@ -20,369 +45,63 @@ import Fill from 'ol/style/Fill';
   imports: [],
   templateUrl: './map.html',
   styleUrl: './map.css',
+  standalone: true,
 })
-export class MapComponent implements OnInit {
-private bicycleParkingData = {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {
-        "id": 1001,
-        "name": "Filippo Re - Dip. Fisiologia",
-        "maxCapacity": 50,
-        "residualCapacity": 50
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              11.355749,
-              44.499046
-            ],
-            [
-              11.355684,
-              44.498491
-            ],
-            [
-              11.355781,
-              44.498503
-            ],
-            [
-              11.355749,
-              44.499046
-            ]
-          ]
-        ]
+export class MapComponent implements OnInit, OnDestroy {
+  /**
+   * Input signal for parking areas GeoJSON data.
+   * Receives data from parent component.
+   */
+  parkingAreas = input<ParkingAreasGeoJSON | null>(null);
+
+  /**
+   * Input signal for parking events GeoJSON data.
+   * Receives data from parent component.
+   */
+  parkingEvents = input<ParkingEventsGeoJSON | null>(null);
+
+  /**
+   * Input signal for the currently selected parking area ID.
+   * When set, the selected area will be highlighted in blue on the map.
+   */
+  selectedAreaId = input<number | null>(null);
+
+  constructor() {
+    // Effect to update parking areas layer when input changes
+    effect(() => {
+      const areas = this.parkingAreas();
+      if (areas && this.parkingAreasLayer) {
+        const features = new GeoJSON().readFeatures(areas, {
+          dataProjection: 'EPSG:4326',
+          featureProjection: 'EPSG:3857'
+        });
+        this.parkingAreasLayer.getSource()?.clear();
+        this.parkingAreasLayer.getSource()?.addFeatures(features);
       }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "id": 1002,
-        "name": "Irnerio - Dip. Farmacia",
-        "maxCapacity": 40,
-        "residualCapacity": 40
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              11.354767,
-              44.499027
-            ],
-            [
-              11.354703,
-              44.498874
-            ],
-            [
-              11.355067,
-              44.498767
-            ],
-            [
-              11.355148,
-              44.498939
-            ],
-            [
-              11.354767,
-              44.499027
-            ]
-          ]
-        ]
+    });
+
+    // Effect to update parking events layer when input changes
+    effect(() => {
+      const events = this.parkingEvents();
+      if (events && this.parkingEventsLayer) {
+        const features = new GeoJSON().readFeatures(events, {
+          dataProjection: 'EPSG:4326',
+          featureProjection: 'EPSG:3857'
+        });
+        this.parkingEventsLayer.getSource()?.clear();
+        this.parkingEventsLayer.getSource()?.addFeatures(features);
       }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "id": 1003,
-        "name": "Filippo Re - Dip. Farmacia",
-        "maxCapacity": 10,
-        "residualCapacity": 10
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              11.355025,
-              44.49936
-            ],
-            [
-              11.354982,
-              44.499276
-            ],
-            [
-              11.355169,
-              44.49923
-            ],
-            [
-              11.355218,
-              44.499321
-            ],
-            [
-              11.355025,
-              44.49936
-            ]
-          ]
-        ]
+    });
+
+    // Effect to refresh parking areas layer styling when selected area changes
+    effect(() => {
+      const selectedId = this.selectedAreaId();
+      // Trigger a style refresh by updating the layer
+      if (this.parkingAreasLayer) {
+        this.parkingAreasLayer.changed();
       }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "id": 1004,
-        "name": "Irnerio - Dip. Fisica",
-        "maxCapacity": 20,
-        "residualCapacity": 20
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              11.353539,
-              44.499329
-            ],
-            [
-              11.353485,
-              44.499237
-            ],
-            [
-              11.353791,
-              44.499161
-            ],
-            [
-              11.353844,
-              44.499253
-            ],
-            [
-              11.353539,
-              44.499329
-            ]
-          ]
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "id": 1005,
-        "name": "Puntoni",
-        "maxCapacity": 10,
-        "residualCapacity": 10
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              11.353233,
-              44.497603
-            ],
-            [
-              11.353201,
-              44.497519
-            ],
-            [
-              11.353335,
-              44.497389
-            ],
-            [
-              11.353469,
-              44.497473
-            ],
-            [
-              11.353372,
-              44.497523
-            ],
-            [
-              11.353421,
-              44.497588
-            ],
-            [
-              11.353233,
-              44.497603
-            ]
-          ]
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "id": 1006,
-        "name": "Scaravilli - Dip. Economia",
-        "maxCapacity": 20,
-        "residualCapacity": 20
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              11.351999,
-              44.497072
-            ],
-            [
-              11.35209,
-              44.496938
-            ],
-            [
-              11.352471,
-              44.497068
-            ],
-            [
-              11.351999,
-              44.497072
-            ]
-          ]
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "id": 1007,
-        "name": "Berti Pichat",
-        "maxCapacity": 60,
-        "residualCapacity": 60
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              11.357251,
-              44.501108
-            ],
-            [
-              11.356773,
-              44.500871
-            ],
-            [
-              11.356768,
-              44.500779
-            ],
-            [
-              11.357208,
-              44.50076
-            ],
-            [
-              11.357251,
-              44.501108
-            ]
-          ]
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "id": 1008,
-        "name": "Mura Anteo Zamboni - Dip. Informatica",
-        "maxCapacity": 20,
-        "residualCapacity": 20
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              11.356264,
-              44.497366
-            ],
-            [
-              11.356285,
-              44.497091
-            ],
-            [
-              11.356393,
-              44.497098
-            ],
-            [
-              11.356376,
-              44.49737
-            ],
-            [
-              11.356264,
-              44.497366
-            ]
-          ]
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "id": 1009,
-        "name": "San Giacomo",
-        "maxCapacity": 5,
-        "residualCapacity": 5
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              11.356307,
-              44.496371
-            ],
-            [
-              11.35614,
-              44.496291
-            ],
-            [
-              11.356258,
-              44.496257
-            ],
-            [
-              11.356328,
-              44.496287
-            ],
-            [
-              11.356307,
-              44.496371
-            ]
-          ]
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "id": 1010,
-        "name": "Mura Anteo Zamboni - Dip. Biochimica",
-        "maxCapacity": 20,
-        "residualCapacity": 20
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              11.355996,
-              44.496861
-            ],
-            [
-              11.35628,
-              44.496773
-            ],
-            [
-              11.356269,
-              44.496869
-            ],
-            [
-              11.355996,
-              44.496861
-            ]
-          ]
-        ]
-      }
-    }
-  ]
-};
+    });
+  }
 
   private map: Map | undefined;
 
@@ -391,57 +110,132 @@ private bicycleParkingData = {
     zoom: 17
   });
 
+  /**
+   * Base tile layer using OpenStreetMap as the map background.
+   */
   private osmLayer = new TileLayer({
     source: new OSM({
     })
   });
 
-  // Style for geometry: Point
+  /**
+   * Style configuration for point geometries (parking events).
+   * Displays a bicycle icon at each parking event location.
+   */
   private pointStyle = new Style({
     image: new Icon({
-      src: 'assets/mapIcons/museum_icon.png',
-      scale: 0.05
+      src: 'assets/mapIcons/pedal_bike.png',
+      scale: 0.40,
     })
   });
 
-  // Style for geometry: Polygon
-  private polygonStyle = new Style({
-    stroke: new Stroke({
-      color: 'rgba(255, 0, 0, 0.8)',
-      width: 2,
-    }),
-    fill: new Fill({
-      color: 'rgba(78, 16, 16, 0.2)',
-    }),
-  });
 
-  // Select style function
+  /**
+   * Creates a polygon style with color based on parking area capacity.
+   *
+   * @param residualCapacity - Number of free parking spots remaining
+   * @param maxCapacity - Total number of parking spots in the area
+   * @param isSelected - Whether the area is currently selected
+   * @returns OpenLayers Style object for rendering the polygon
+   *
+   * @description
+   * Generates a Style with both stroke and fill, where:
+   * - If selected: Blue color for stroke (80% opacity) and fill (30% opacity)
+   * - If not selected: Uses the capacity color at 80% opacity for stroke, 20% for fill
+   */
+  private createPolygonStyle(residualCapacity: number, maxCapacity: number, isSelected: boolean): Style {
+    if (isSelected) {
+      return new Style({
+        stroke: new Stroke({
+          color: MapUtils.SELECTED_AREA_COLOR,
+          width: 3,
+        }),
+        fill: new Fill({
+          color: MapUtils.SELECTED_AREA_FILL_COLOR,
+        }),
+      });
+    }
+
+    const color = MapUtils.getCapacityColor(residualCapacity, maxCapacity);
+    return new Style({
+      stroke: new Stroke({
+        color: color,
+        width: 2,
+      }),
+      fill: new Fill({
+        color: color.replace('0.8', '0.2'), // Use same color with lower opacity for fill
+      }),
+    });
+  }
+
+  /**
+   * Dynamic style function that applies appropriate styling based on geometry type.
+   *
+   * @param feature - OpenLayers feature to be styled
+   * @returns Style object for the feature, or undefined if geometry type is unsupported
+   *
+   * @description
+   * Applies different styles based on feature geometry:
+   * - Point: Uses bicycle icon style (for parking events)
+   * - Polygon: Uses capacity-based color style (for parking areas), or blue if selected
+   *
+   * For polygons, extracts residual_capacity and max_capacity properties
+   * to determine the appropriate color coding. If the area ID matches
+   * the selectedAreaId, it will be highlighted in blue.
+   */
   private styleFunction = (feature: any) => {
     const geometryType = feature.getGeometry().getType();
     if (geometryType === 'Point') {
       return this.pointStyle;
     } else if (geometryType === 'Polygon') {
-      return this.polygonStyle;
+      const properties = feature.getProperties();
+      const areaId = properties.id;
+      const residualCapacity = properties.residual_capacity ?? 0;
+      const maxCapacity = properties.max_capacity ?? 1;
+      const isSelected = areaId === this.selectedAreaId();
+      return this.createPolygonStyle(residualCapacity, maxCapacity, isSelected);
     }
     console.error('Unsupported geometry type:', geometryType);
     return undefined;
   };
 
-  private testGeoJSONLayer = new VectorLayer({
-    source: new VectorSource({
-      features: new GeoJSON().readFeatures(this.bicycleParkingData, {
-        dataProjection: 'EPSG:4326',
-        featureProjection: 'EPSG:3857'
-      })
-    }),
+  /**
+   * Vector layer for displaying parking areas as polygons.
+   * Uses the styleFunction to apply capacity-based color coding.
+   */
+  private parkingAreasLayer = new VectorLayer({
+    source: new VectorSource(),
     style: this.styleFunction
   });
 
+  /**
+   * Vector layer for displaying parking events as point markers.
+   * Uses the styleFunction to apply bicycle icon styling.
+   */
+  private parkingEventsLayer = new VectorLayer({
+    source: new VectorSource(),
+    style: this.styleFunction
+  });
+
+  /**
+   * Component initialization lifecycle hook.
+   *
+   * @description
+   * Creates the OpenLayers Map instance with base OSM layer and two vector layers.
+   * Data updates are handled reactively via effects that respond to input signal changes.
+   */
   ngOnInit() {
     this.map = new Map({
       target: 'map',
       view: this.view,
-      layers: [this.osmLayer, this.testGeoJSONLayer]
+      layers: [this.osmLayer, this.parkingAreasLayer, this.parkingEventsLayer]
     });
+  }
+
+  /**
+   * Component cleanup lifecycle hook.
+   */
+  ngOnDestroy(): void {
+    // Effects are automatically cleaned up by Angular
   }
 }
