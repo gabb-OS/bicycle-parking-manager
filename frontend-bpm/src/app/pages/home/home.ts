@@ -46,7 +46,7 @@ export class Home implements OnInit, OnDestroy {
       .subscribe((areas) => this.parkingAreasList.set(areas));
 
     // Subscribe to parking events updates
-    this.parkingEventsService.parkingEvents$
+    this.parkingEventsService.parkingEventsGeoJSON$
       .pipe(takeUntil(this.destroy$))
       .subscribe((events) => this.parkingEvents.set(events));
 

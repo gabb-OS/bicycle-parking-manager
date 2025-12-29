@@ -18,6 +18,5 @@ export interface ParkingArea {
   occupancy_percentage: number;
 }
 
-// Type aliases using standard GeoJSON types
 export type ParkingAreaFeature = Feature<Polygon, ParkingAreaProperties>;
 export type ParkingAreasGeoJSON = FeatureCollection<Polygon, ParkingAreaProperties>;

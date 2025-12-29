@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@environments/environment';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { ParkingEventsGeoJSON } from '@core/types/parking-event';
+import { ParkingEvent, ParkingEventsGeoJSON } from '@core/types/parking-event';
 
 /**
  * Service for managing parking events data.
@@ -48,11 +48,23 @@ export class ParkingEventsService {
    * Internal BehaviorSubject that holds the current parking events state.
    * Initialized with null until the first data is fetched.
    */
-  private parkingEventsSource = new BehaviorSubject<ParkingEventsGeoJSON | null>(null);
+  private parkingEventsGeoJSONSource = new BehaviorSubject<ParkingEventsGeoJSON | null>(null);
+
+  /**
+   * Internal BehaviorSubject that holds the current parking events list.
+   * Initialized with null until the first data is fetched.
+   */
+  private parkingEventsSource = new BehaviorSubject<ParkingEvent[] | null>(null);
 
   /**
    * Public Observable that components can subscribe to for parking events updates.
    * Emits the latest parking events data whenever it changes.
+   */
+  parkingEventsGeoJSON$ = this.parkingEventsGeoJSONSource.asObservable();
+
+  /**
+   * Public Observable that components can subscribe to for parking events list updates.
+   * Emits the latest list of parking events whenever it changes.
    */
   parkingEvents$ = this.parkingEventsSource.asObservable();
 
@@ -78,6 +90,30 @@ export class ParkingEventsService {
   }
 
   /**
+   * Fetches all parking events from the backend API.
+   *
+   * @returns Observable<ParkingEvent[]> - An observable that emits an array of parking event objects
+   *
+   * @description
+   * This method performs an HTTP GET request to retrieve all parking events with their
+   * complete data including geometry, timestamps, and event type.
+   *
+   * The data includes:
+   * - id: Unique identifier for the parking event
+   * - user_id: ID of the user who created the event
+   * - parking_area_id: ID of the parking area where the event occurred
+   * - location_point: Point geometry representing the event location
+   * - type: Type of event ('park' or 'leave')
+   * - start_time: Start time of the parking event
+   * - end_time: End time of the parking event
+   */
+  getParkingEvents(): Observable<ParkingEvent[]> {
+    return this.http.get<ParkingEvent[]>(`${this.baseUrl}/`).pipe(
+      tap((parkingEvents) => this.setParkingEventsListSource(parkingEvents))
+    );
+  }
+
+  /**
    * Updates the internal BehaviorSubject with new parking events data.
    *
    * @param parkingEvents - The parking events data to broadcast to all subscribers
@@ -87,6 +123,19 @@ export class ParkingEventsService {
    * be called directly from outside the service.
    */
   private setParkingEventsSource(parkingEvents: ParkingEventsGeoJSON): void {
+    this.parkingEventsGeoJSONSource.next(parkingEvents);
+  }
+
+  /**
+   * Updates the internal BehaviorSubject with new parking events list.
+   *
+   * @param parkingEvents - The list of parking events to broadcast to all subscribers
+   *
+   * @private
+   * This method is called internally by getParkingEvents() and should not
+   * be called directly from outside the service.
+   */
+  private setParkingEventsListSource(parkingEvents: ParkingEvent[]): void {
     this.parkingEventsSource.next(parkingEvents);
   }
 }
