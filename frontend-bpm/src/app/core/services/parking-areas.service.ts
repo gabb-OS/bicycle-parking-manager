@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@environments/environment';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { ParkingAreasGeoJSON } from '@core/types/parking-area';
+import { ParkingArea, ParkingAreasGeoJSON } from '@core/types/parking-area';
 
 /**
  * Service for managing parking areas data.
@@ -48,11 +48,23 @@ export class ParkinAreasService {
    * Internal BehaviorSubject that holds the current parking areas state.
    * Initialized with null until the first data is fetched.
    */
-  private parkingAreasSource = new BehaviorSubject<ParkingAreasGeoJSON | null>(null);
+  private parkingAreasGeoJSONSource = new BehaviorSubject<ParkingAreasGeoJSON | null>(null);
+
+  /**
+   * Internal BehaviorSubject that holds the current parking areas list.
+   * Initialized with null until the first data is fetched.
+   */
+  private parkingAreasSource = new BehaviorSubject<ParkingArea[] | null>(null);
 
   /**
    * Public Observable that components can subscribe to for parking areas updates.
    * Emits the latest parking areas data whenever it changes.
+   */
+  parkingAreasGeoJSON$ = this.parkingAreasGeoJSONSource.asObservable();
+
+  /**
+   * Public Observable that components can subscribe to for parking areas list updates.
+   * Emits the latest list of parking areas whenever it changes.
    */
   parkingAreas$ = this.parkingAreasSource.asObservable();
 
@@ -72,9 +84,32 @@ export class ParkinAreasService {
    * - Additional metadata for each parking area
    */
   getParkingAreasGEOJSON(): Observable<ParkingAreasGeoJSON> {
-    return this.http.get<ParkingAreasGeoJSON>(`${this.baseUrl}/geojson`).pipe(
-      tap((parkingAreas) => this.setParkingAreasSource(parkingAreas))
-    );
+    return this.http
+      .get<ParkingAreasGeoJSON>(`${this.baseUrl}/geojson`)
+      .pipe(tap((parkingAreas) => this.setParkingAreasGeoJSONSource(parkingAreas)));
+  }
+
+  /**
+   * Fetches all parking areas from the backend API.
+   *
+   * @returns Observable<ParkingArea[]> - An observable that emits an array of parking area objects
+   *
+   * @description
+   * This method performs an HTTP GET request to retrieve all parking areas with their
+   * complete data including geometry, capacity information, and occupancy percentage.
+   *
+   * The data includes:
+   * - id: Unique identifier for the parking area
+   * - name: Name of the parking area
+   * - location_area: Polygon geometry representing the parking area boundary
+   * - max_capacity: Maximum number of bicycles that can be parked
+   * - residual_capacity: Current number of available spots
+   * - occupancy_percentage: Percentage of occupied spots
+   */
+  getParkingAreas(): Observable<ParkingArea[]> {
+    return this.http
+      .get<ParkingArea[]>(`${this.baseUrl}/`)
+      .pipe(tap((parkingAreas) => this.setParkingAreasSource(parkingAreas)));
   }
 
   /**
@@ -86,7 +121,20 @@ export class ParkinAreasService {
    * This method is called internally by getParkingAreasGEOJSON() and should not
    * be called directly from outside the service.
    */
-  private setParkingAreasSource(parkingAreas: ParkingAreasGeoJSON): void {
+  private setParkingAreasGeoJSONSource(parkingAreas: ParkingAreasGeoJSON): void {
+    this.parkingAreasGeoJSONSource.next(parkingAreas);
+  }
+
+  /**
+   * Updates the internal BehaviorSubject with new parking areas list.
+   *
+   * @param parkingAreas - The list of parking areas to broadcast to all subscribers
+   *
+   * @private
+   * This method is called internally by getParkingAreas() and should not
+   * be called directly from outside the service.
+   */
+  private setParkingAreasSource(parkingAreas: ParkingArea[]): void {
     this.parkingAreasSource.next(parkingAreas);
   }
 }

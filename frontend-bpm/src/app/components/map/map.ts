@@ -65,7 +65,6 @@ export class MapComponent implements OnInit, OnDestroy {
     effect(() => {
       const areas = this.parkingAreas();
       if (areas && this.parkingAreasLayer) {
-        console.log('Received parking areas update:', areas);
         const features = new GeoJSON().readFeatures(areas, {
           dataProjection: 'EPSG:4326',
           featureProjection: 'EPSG:3857'
@@ -79,7 +78,6 @@ export class MapComponent implements OnInit, OnDestroy {
     effect(() => {
       const events = this.parkingEvents();
       if (events && this.parkingEventsLayer) {
-        console.log('Received parking events update:', events);
         const features = new GeoJSON().readFeatures(events, {
           dataProjection: 'EPSG:4326',
           featureProjection: 'EPSG:3857'
