@@ -13,7 +13,7 @@ import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
 import { ParkingAreasGeoJSON } from '@core/types/parking-area';
 import { ParkingEventsGeoJSON } from '@core/types/parking-event';
-import { getCapacityColor } from './utils/utils';
+import { MapUtils } from '@core/utils/map.utils';
 
 /**
  * Map component for visualizing bicycle parking areas and events.
@@ -128,7 +128,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * - Fill: Uses the same color at 20% opacity for better visibility
    */
   private createPolygonStyle(residualCapacity: number, maxCapacity: number): Style {
-    const color = getCapacityColor(residualCapacity, maxCapacity);
+    const color = MapUtils.getCapacityColor(residualCapacity, maxCapacity);
     return new Style({
       stroke: new Stroke({
         color: color,

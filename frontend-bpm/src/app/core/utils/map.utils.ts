@@ -1,4 +1,6 @@
-/**
+export class MapUtils {
+
+  /**
    * Calculates the color for a parking area based on its occupancy ratio.
    *
    * @param residualCapacity - Number of free parking spots remaining
@@ -15,7 +17,7 @@
    * The color is calculated using linear interpolation between green and red
    * based on the occupancy ratio: (maxCapacity - residualCapacity) / maxCapacity
    */
-  export function getCapacityColor(residualCapacity: number, maxCapacity: number): string {
+  static getCapacityColor(residualCapacity: number, maxCapacity: number): string {
     if (maxCapacity === 0) return 'rgba(128, 128, 128, 0.8)'; // Gray for invalid capacity
 
     const occupancyRatio = 1 - (residualCapacity / maxCapacity);
@@ -27,3 +29,5 @@
 
     return `rgba(${red}, ${green}, 0, 0.8)`;
   }
+
+}
