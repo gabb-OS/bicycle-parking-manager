@@ -5,6 +5,8 @@ export interface ChartData {
   labels: string[];
   values: number[];
   areaName: string;
+  chartType?: 'step' | 'line' | 'bar';
+  tooltipFormat?: string;
 }
 
 /**
@@ -15,4 +17,12 @@ export interface TimeInterval {
   end: Date;
   label: string;
   count: number;
+}
+
+/**
+ * Interface representing the date range for filtering.
+ */
+export interface DateRange {
+  startDate: Date;
+  endDate: Date;
 }

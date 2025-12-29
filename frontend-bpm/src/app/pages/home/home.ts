@@ -8,6 +8,7 @@ import { ParkingArea, ParkingAreasGeoJSON } from '@core/types/parking-area';
 import { ParkingEvent, ParkingEventsGeoJSON } from '@core/types/parking-event';
 import { FiltersValue } from '@core/types/filters';
 import { ChartData } from '@core/types/chart-data';
+import { ParkingChartUtils } from '@core/utils/parking-chart.utils';
 import { Subject, take, takeUntil } from 'rxjs';
 
 @Component({
@@ -78,7 +79,6 @@ export class Home implements OnInit, OnDestroy {
   onFiltersApplied(filters: FiltersValue): void {
     this.appliedFilters.set(filters);
     this.computeChartData(filters);
-    console.log('Filters applied:', filters);
   }
 
   /**
@@ -88,12 +88,14 @@ export class Home implements OnInit, OnDestroy {
   onFiltersReset(): void {
     this.appliedFilters.set(null);
     this.chartData.set(null);
-    console.log('Filters reset');
   }
 
   /**
    * Computes the chart data based on the applied filters.
-   * Filters parking events by area and time range, then aggregates by time intervals.
+   * Uses ParkingChartUtils to transform events into chart-ready data.
+   * Automatically selects appropriate chart type based on date range:
+   * - Single day (≤24 hours): Step chart with 30-minute intervals
+   * - Multi-day (>24 hours): Bar chart with daily aggregation
    *
    * @param filters - The filter values to apply
    */
@@ -109,90 +111,30 @@ export class Home implements OnInit, OnDestroy {
     const selectedArea = areas.find(area => area.id === filters.zone);
     const areaName = selectedArea?.name ?? 'Area sconosciuta';
 
-    // Parse date range
     const startDate = new Date(filters.startDate);
     const endDate = new Date(filters.endDate);
     // Set end date to end of day
     endDate.setHours(23, 59, 59, 999);
 
-    // Filter events by parking area and time range
-    const filteredEvents = events.filter(event => {
-      const eventStart = new Date(event.start_time);
-      const eventEnd = new Date(event.end_time);
-      return event.parking_area_id === filters.zone &&
-             eventStart >= startDate &&
-             eventEnd <= endDate;
-    });
+    const areaEvents = ParkingChartUtils.filterEventsByArea(events, filters.zone);
 
-    // Generate time intervals (evenly split the time range)
-    const intervals = this.generateTimeIntervals(startDate, endDate);
+    const filteredEvents = ParkingChartUtils.filterEventsByTimeRange(areaEvents, startDate, endDate);
 
-    // Count events per interval
-    const values = intervals.map(interval => {
-      return filteredEvents.filter(event => {
-        const eventStart = new Date(event.start_time);
-        return eventStart >= interval.start && eventStart < interval.end;
-      }).length;
-    });
-
-    const labels = intervals.map(interval => interval.label);
+    const processedData = ParkingChartUtils.processEvents(
+      filteredEvents,
+      startDate,
+      endDate,
+      areaName
+    );
 
     this.chartData.set({
-      labels,
-      values,
-      areaName
+      labels: processedData.labels,
+      values: processedData.values,
+      areaName: processedData.areaName,
+      chartType: processedData.chartType,
+      tooltipFormat: processedData.tooltipFormat
     });
 
-    console.log('Chart data computed:', this.chartData());
-  }
-
-  /**
-   * Generates evenly distributed time intervals for the chart.
-   * Automatically determines the best interval size based on the date range.
-   *
-   * @param startDate - Start of the time range
-   * @param endDate - End of the time range
-   * @returns Array of time intervals with labels
-   */
-  private generateTimeIntervals(startDate: Date, endDate: Date): { start: Date; end: Date; label: string }[] {
-    const intervals: { start: Date; end: Date; label: string }[] = [];
-    const diffMs = endDate.getTime() - startDate.getTime();
-    const diffDays = diffMs / (1000 * 60 * 60 * 24);
-
-    let intervalMs: number;
-    let formatLabel: (date: Date) => string;
-
-    if (diffDays <= 1) {
-      // Less than 1 day: hourly intervals
-      intervalMs = 1000 * 60 * 60; // 1 hour
-      formatLabel = (date: Date) => date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-    } else if (diffDays <= 7) {
-      // 1-7 days: 6-hour intervals
-      intervalMs = 1000 * 60 * 60 * 6; // 6 hours
-      formatLabel = (date: Date) => date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' }) + ' ' +
-                                     date.toLocaleTimeString('it-IT', { hour: '2-digit' });
-    } else if (diffDays <= 31) {
-      // 1 week to 1 month: daily intervals
-      intervalMs = 1000 * 60 * 60 * 24; // 1 day
-      formatLabel = (date: Date) => date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
-    } else {
-      // More than 1 month: weekly intervals
-      intervalMs = 1000 * 60 * 60 * 24 * 7; // 1 week
-      formatLabel = (date: Date) => date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
-    }
-
-    let current = new Date(startDate);
-    while (current < endDate) {
-      const intervalEnd = new Date(Math.min(current.getTime() + intervalMs, endDate.getTime()));
-      intervals.push({
-        start: new Date(current),
-        end: intervalEnd,
-        label: formatLabel(current)
-      });
-      current = intervalEnd;
-    }
-
-    return intervals;
   }
 
   /**

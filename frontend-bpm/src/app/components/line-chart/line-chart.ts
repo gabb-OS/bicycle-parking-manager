@@ -4,13 +4,13 @@ import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import * as echarts from 'echarts/core';
 import { EChartsCoreOption } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
-import { LineChart } from 'echarts/charts';
+import { LineChart, BarChart } from 'echarts/charts';
 import { GridComponent, TitleComponent, TooltipComponent } from 'echarts/components';
 import { CommonModule } from '@angular/common';
 import { ChartData } from '@core/types/chart-data';
 
 
-echarts.use([LineChart, GridComponent, TitleComponent, TooltipComponent, CanvasRenderer]);
+echarts.use([LineChart, BarChart, GridComponent, TitleComponent, TooltipComponent, CanvasRenderer]);
 
 @Component({
   selector: 'app-line-chart',
@@ -72,50 +72,28 @@ export class LineChartComponent {
 
   /**
    * Builds the chart option based on the provided chart data.
+   * Dynamically switches between step, line, and bar charts based on chartType.
    *
-   * @param data - The chart data containing labels, values, and area name
+   * @param data - The chart data containing labels, values, area name, and chart type
    * @returns EChartsCoreOption configured for the data
    */
   private buildChartOption(data: ChartData): EChartsCoreOption {
+    const chartType = data.chartType ?? 'line';
+
     return {
       title: {
         show: true,
-        text: `Andamento parcheggi per ${data.areaName}`,
+        text: `Occupazione parcheggio: ${data.areaName}`,
         left: 'center',
         textStyle: {
           fontSize: 16,
           fontWeight: 'bold'
         }
       },
-      series: [
-        {
-          name: 'Eventi parcheggio',
-          data: data.values,
-          type: 'line',
-          smooth: true,
-          areaStyle: {
-            opacity: 0.3
-          },
-          lineStyle: {
-            width: 2
-          }
-        },
-      ],
-      xAxis: {
-        type: 'category',
-        data: data.labels,
-        axisTick: {
-          show: true,
-          alignWithLabel: true,
-          interval: 0,
-        },
-        axisLabel: {
-          rotate: 45,
-          fontSize: 10,
-        }
-      },
+      series: [this.buildSeriesConfig(data, chartType)],
+      xAxis: this.buildXAxisConfig(data, chartType),
       yAxis: {
-        name: 'Eventi parcheggio',
+        name: 'Biciclette parcheggiate',
         nameLocation: 'middle',
         nameGap: 40,
         type: 'value',
@@ -124,7 +102,7 @@ export class LineChartComponent {
       tooltip: {
         trigger: 'axis',
         axisPointer: {
-          type: 'line',
+          type: chartType === 'bar' ? 'shadow' : 'line',
           lineStyle: {
             type: 'dashed',
             width: 2,
@@ -144,5 +122,122 @@ export class LineChartComponent {
         bottom: '20%',
       }
     };
+  }
+
+  /**
+   * Builds the series configuration based on chart type.
+   *
+   * @param data - The chart data
+   * @param chartType - The type of chart to render
+   * @returns Series configuration object
+   */
+  private buildSeriesConfig(data: ChartData, chartType: 'step' | 'line' | 'bar'): object {
+    const baseConfig = {
+      name: 'Biciclette parcheggiate',
+      data: data.values,
+    };
+
+    switch (chartType) {
+      case 'step':
+        return {
+          ...baseConfig,
+          type: 'line',
+          step: 'end',
+          areaStyle: {
+            opacity: 0.3
+          },
+          lineStyle: {
+            width: 2
+          },
+          itemStyle: {
+            color: '#5470c6'
+          }
+        };
+
+      case 'bar':
+        return {
+          ...baseConfig,
+          type: 'bar',
+          barWidth: '60%',
+          itemStyle: {
+            color: '#91cc75',
+            borderRadius: [4, 4, 0, 0]
+          }
+        };
+
+      case 'line':
+      default:
+        return {
+          ...baseConfig,
+          type: 'line',
+          smooth: true,
+          areaStyle: {
+            opacity: 0.3
+          },
+          lineStyle: {
+            width: 2
+          }
+        };
+    }
+  }
+
+  /**
+   * Builds the X-axis configuration based on chart type.
+   *
+   * @param data - The chart data
+   * @param chartType - The type of chart to render
+   * @returns X-axis configuration object
+   */
+  private buildXAxisConfig(data: ChartData, chartType: 'step' | 'line' | 'bar'): object {
+    const baseConfig = {
+      type: 'category',
+      data: data.labels,
+    };
+
+    if (chartType === 'step') {
+      // For step charts (single-day view), show more labels for time granularity
+      return {
+        ...baseConfig,
+        axisTick: {
+          show: true,
+          alignWithLabel: true,
+        },
+        axisLabel: {
+          rotate: 45,
+          fontSize: 10,
+          interval: Math.floor(data.labels.length / 12), // Show ~12 labels
+        },
+        boundaryGap: false, // Step line starts from axis
+      };
+    } else if (chartType === 'bar') {
+      // For bar charts (multi-day view), center labels under bars
+      return {
+        ...baseConfig,
+        axisTick: {
+          show: true,
+          alignWithLabel: true,
+        },
+        axisLabel: {
+          rotate: 45,
+          fontSize: 10,
+          interval: 0, // Show all labels for daily data
+        },
+        boundaryGap: true, // Required for bar charts
+      };
+    } else {
+      // Default line chart config
+      return {
+        ...baseConfig,
+        axisTick: {
+          show: true,
+          alignWithLabel: true,
+          interval: 0,
+        },
+        axisLabel: {
+          rotate: 45,
+          fontSize: 10,
+        }
+      };
+    }
   }
 }
