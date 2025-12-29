@@ -4,8 +4,9 @@ import { Filtersbar } from "@components/filtersbar/filtersbar";
 import { LineChartComponent } from '@components/line-chart/line-chart';
 import { ParkinAreasService } from '@core/services/parking-areas.service';
 import { ParkingEventsService } from '@core/services/parking-events.service';
-import { ParkingAreasGeoJSON } from '@core/types/parking-area';
+import { ParkingArea, ParkingAreasGeoJSON } from '@core/types/parking-area';
 import { ParkingEventsGeoJSON } from '@core/types/parking-event';
+import { FiltersValue } from '@core/types/filters';
 import { Subject, take, takeUntil } from 'rxjs';
 
 @Component({
@@ -27,11 +28,22 @@ export class Home implements OnInit, OnDestroy {
   parkingAreas = signal<ParkingAreasGeoJSON | null>(null);
   parkingEvents = signal<ParkingEventsGeoJSON | null>(null);
 
+  // Signal to hold the list of parking areas for the filtersbar dropdown
+  parkingAreasList = signal<ParkingArea[] | null>(null);
+
+  // Signal to hold the current applied filters
+  appliedFilters = signal<FiltersValue | null>(null);
+
   ngOnInit(): void {
     // Subscribe to parking areas updates
     this.parkingAreasService.parkingAreasGeoJSON$
       .pipe(takeUntil(this.destroy$))
       .subscribe((areas) => this.parkingAreas.set(areas));
+
+    // Subscribe to parking areas list updates for the filtersbar
+    this.parkingAreasService.parkingAreas$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((areas) => this.parkingAreasList.set(areas));
 
     // Subscribe to parking events updates
     this.parkingEventsService.parkingEvents$
@@ -40,7 +52,28 @@ export class Home implements OnInit, OnDestroy {
 
     // Trigger initial data fetch
     this.parkingAreasService.getParkingAreasGEOJSON().pipe(take(1)).subscribe();
+    this.parkingAreasService.getParkingAreas().pipe(take(1)).subscribe();
     this.parkingEventsService.getParkingEventsGEOJSON().pipe(take(1)).subscribe();
+  }
+
+  /**
+   * Handles the filters applied event from the filtersbar component.
+   * Updates the appliedFilters signal with the new filter values.
+   *
+   * @param filters - The filter values emitted by the filtersbar
+   */
+  onFiltersApplied(filters: FiltersValue): void {
+    this.appliedFilters.set(filters);
+    console.log('Filters applied:', filters);
+  }
+
+  /**
+   * Handles the filters reset event from the filtersbar component.
+   * Clears the appliedFilters signal.
+   */
+  onFiltersReset(): void {
+    this.appliedFilters.set(null);
+    console.log('Filters reset');
   }
 
   /**

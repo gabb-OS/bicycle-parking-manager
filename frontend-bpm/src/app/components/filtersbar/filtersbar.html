@@ -1,32 +1,45 @@
 
-<div class="row my-2">
-    <div class="col">
-        <label for="dropDown" class="form-label">Zona</label>
-        <select id="dropDown" class="form-select">
-            <option selected>Seleziona una zona</option>
-            <option (click)="select('Zona 1')">Zona 1</option>
-            <option (click)="select('Zona 2')">Zona 2</option>
-            <option (click)="select('Zona 3')">Zona 3</option>
-        </select>
-	</div>
-</div>
-
-<div class="row my-2">
-    <div class="col">
-        <label for="dataInizio" class="form-label">Data Inizio</label>
-        <input 
-            type="date" 
-            id="dataInizio" 
-            class="form-control">
+<form [formGroup]="filtersForm" (ngSubmit)="onSubmit()">
+    <div class="row my-2">
+        <div class="col">
+            <label for="zone" class="form-label">Zona</label>
+            <select id="zone" class="form-select" formControlName="zone">
+                <option [ngValue]="null">Seleziona una zona</option>
+                @for (area of parkingAreas(); track area.id) {
+                    <option [ngValue]="area.id">{{ area.name }}</option>
+                }
+            </select>
+        </div>
     </div>
-</div>
 
-<div class="row my-2">
-    <div class="col">
-        <label for="dataFine" class="form-label">Data Fine</label>
-        <input 
-            type="date" 
-            id="dataFine" 
-            class="form-control">
+    <div class="row my-2">
+        <div class="col">
+            <label for="startDate" class="form-label">Data Inizio</label>
+            <input
+                type="date"
+                id="startDate"
+                class="form-control"
+                formControlName="startDate">
+        </div>
     </div>
-</div>
+
+    <div class="row my-2">
+        <div class="col">
+            <label for="endDate" class="form-label">Data Fine</label>
+            <input
+                type="date"
+                id="endDate"
+                class="form-control"
+                formControlName="endDate">
+        </div>
+    </div>
+
+    <div class="row my-3">
+        <div class="col">
+            <button type="submit" class="btn btn-primary w-100" [disabled]="!filtersForm.valid">Applica Filtri</button>
+        </div>
+        <div class="col">
+            <button type="button" class="btn btn-outline-secondary w-100" (click)="onReset()">Reset Filtri</button>
+        </div>
+    </div>
+</form>
