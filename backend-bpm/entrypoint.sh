@@ -7,9 +7,12 @@ set -e
 echo "Checking for database migrations..."
 flask db upgrade
 
-# 2. Seed the database (Idempotent: safe to run every time)
-echo "Seeding database..."
-flask seed-db
+if [ "$SEED_DB" = "true" ]; then
+    echo "Seeding database..."
+    flask seed-db
+else
+    echo "Skipping database seeding"
+fi
 
 # 2. Execute the command passed to the container
 # In Prod: This will be "gunicorn ..."

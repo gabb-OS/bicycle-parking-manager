@@ -35,6 +35,8 @@ services:
   # Database Access (Expose Port)
   # =========================================
   db:
+    environment:
+      - SEED_DB=true
     ports:
       # Expose 5432 locally so you can connect via DBeaver/TablePlus
       - "5432:5432"
