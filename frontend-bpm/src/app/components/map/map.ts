@@ -6,6 +6,7 @@ import OSM from 'ol/source/OSM';
 import { fromLonLat } from 'ol/proj';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
+import HeatmapLayer from 'ol/layer/Heatmap';
 import GeoJSON from 'ol/format/GeoJSON';
 import Style from 'ol/style/Style';
 import Icon from 'ol/style/Icon';
@@ -86,16 +87,34 @@ export class MapComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Effect to update parking events layer when input changes
+    // Effect to update parking events layer and heatmap layer when input changes
     effect(() => {
       const events = this.parkingEvents();
-      if (events && this.parkingEventsLayer) {
+      const isHeatmapEnabled = this.isHeatmapEnabled();
+
+      if (events) {
         const features = new GeoJSON().readFeatures(events, {
           dataProjection: 'EPSG:4326',
           featureProjection: 'EPSG:3857'
         });
-        this.parkingEventsLayer.getSource()?.clear();
-        this.parkingEventsLayer.getSource()?.addFeatures(features);
+
+        // Update regular events layer
+        if (this.parkingEventsLayer) {
+          this.parkingEventsLayer.getSource()?.clear();
+          this.parkingEventsLayer.getSource()?.addFeatures(features);
+          this.parkingEventsLayer.setVisible(!isHeatmapEnabled);
+        }
+
+        // Update heatmap layer with the same features
+        if (this.heatmapLayer) {
+          const heatmapFeatures = new GeoJSON().readFeatures(events, {
+            dataProjection: 'EPSG:4326',
+            featureProjection: 'EPSG:3857'
+          });
+          this.heatmapLayer.getSource()?.clear();
+          this.heatmapLayer.getSource()?.addFeatures(heatmapFeatures);
+          this.heatmapLayer.setVisible(isHeatmapEnabled);
+        }
       }
     });
 
@@ -224,6 +243,19 @@ export class MapComponent implements OnInit, OnDestroy {
   });
 
   /**
+   * Heatmap layer for displaying parking event density.
+   * Shows crowded areas based on parking event concentration.
+   * Hidden by default, toggled via isHeatmapEnabled input.
+   */
+  private heatmapLayer = new HeatmapLayer({
+    source: new VectorSource(),
+    blur: 15,
+    radius: 10,
+    weight: () => 1,
+    visible: false
+  });
+
+  /**
    * Component initialization lifecycle hook.
    *
    * @description
@@ -234,7 +266,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.map = new Map({
       target: 'map',
       view: this.view,
-      layers: [this.osmLayer, this.parkingAreasLayer, this.parkingEventsLayer]
+      layers: [this.osmLayer, this.parkingAreasLayer, this.parkingEventsLayer, this.heatmapLayer]
     });
   }
 
