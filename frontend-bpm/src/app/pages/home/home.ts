@@ -2,6 +2,7 @@ import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { MapComponent } from '@components/map/map';
 import { Filtersbar } from "@components/filtersbar/filtersbar";
 import { LineChartComponent } from '@components/line-chart/line-chart';
+import { DataVisualization } from '@components/data-visualization/data-visualization';
 import { ParkinAreasService } from '@core/services/parking-areas.service';
 import { ParkingEventsService } from '@core/services/parking-events.service';
 import { ParkingArea, ParkingAreasGeoJSON } from '@core/types/parking-area';
@@ -13,7 +14,7 @@ import { Subject, take, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-home',
-  imports: [MapComponent, Filtersbar, LineChartComponent],
+  imports: [MapComponent, Filtersbar, LineChartComponent, DataVisualization],
   templateUrl: './home.html',
   styleUrl: './home.css',
   standalone: true,
@@ -44,6 +45,9 @@ export class Home implements OnInit, OnDestroy {
 
   // Signal to hold the currently selected parking area ID for map highlighting
   selectedAreaId = signal<number | null>(null);
+
+  // Signal to hold the heatmap visualization toggle state
+  isHeatmapEnabled = signal<boolean>(false);
 
   ngOnInit(): void {
     // Subscribe to parking areas updates
@@ -93,6 +97,16 @@ export class Home implements OnInit, OnDestroy {
     this.appliedFilters.set(null);
     this.selectedAreaId.set(null);
     this.chartData.set(null);
+  }
+
+  /**
+   * Handles the heatmap toggle event from the data-visualization component.
+   * Updates the isHeatmapEnabled signal to be passed to the map.
+   *
+   * @param enabled - Whether the heatmap visualization is enabled
+   */
+  onHeatmapToggled(enabled: boolean): void {
+    this.isHeatmapEnabled.set(enabled);
   }
 
   /**

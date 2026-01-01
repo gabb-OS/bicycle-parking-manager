@@ -3,11 +3,17 @@
         <app-map
             [parkingAreas]="parkingAreas()"
             [parkingEvents]="parkingEvents()"
-            [selectedAreaId]="selectedAreaId()">
+            [selectedAreaId]="selectedAreaId()"
+            [isHeatmapEnabled]="isHeatmapEnabled()">
         </app-map>
     </div>
     <div class="col px-4">
         <div class="row">
+            <app-data-visualization
+                (heatmapToggled)="onHeatmapToggled($event)">
+            </app-data-visualization>
+        </div>
+        <div class="row mt-4">
             <app-filtersbar
                 [parkingAreas]="parkingAreasList()"
                 (filtersApplied)="onFiltersApplied($event)"

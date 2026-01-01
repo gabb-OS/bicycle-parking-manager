@@ -66,6 +66,12 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   selectedAreaId = input<number | null>(null);
 
+  /**
+   * Input signal for heatmap visualization toggle.
+   * When true, the map should display a heatmap visualization.
+   */
+  isHeatmapEnabled = input<boolean>(false);
+
   constructor() {
     // Effect to update parking areas layer when input changes
     effect(() => {
