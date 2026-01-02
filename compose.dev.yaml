@@ -28,6 +28,7 @@ services:
       - FLASK_APP=flaskr
       - FLASK_DEBUG=1
       - DB_URL=postgresql+psycopg://postgres:postgres@db:5432/postgres
+      - SEED_DB=true
     networks:
       - bpm-network
 
@@ -35,8 +36,6 @@ services:
   # Database Access (Expose Port)
   # =========================================
   db:
-    environment:
-      - SEED_DB=true
     ports:
       # Expose 5432 locally so you can connect via DBeaver/TablePlus
       - "5432:5432"
