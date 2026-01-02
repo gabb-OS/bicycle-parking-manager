@@ -31,7 +31,7 @@ export class MapUtils {
 
     // Interpolate from green (0, 255, 0) to red (255, 0, 0)
     const red = Math.round(255 * clampedRatio);
-    const green = Math.round(255 * (1 - clampedRatio));
+    const green = Math.round(150 * (1 - clampedRatio));
 
     return `rgba(${red}, ${green}, 0, 0.8)`;
   }
