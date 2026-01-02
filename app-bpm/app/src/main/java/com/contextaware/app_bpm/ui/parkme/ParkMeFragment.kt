@@ -1,4 +1,4 @@
-package com.contextaware.app_bpm.ui.areeparcheggio
+package com.contextaware.app_bpm.ui.parkme
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.contextaware.app_bpm.databinding.FragmentGalleryBinding
+import com.contextaware.app_bpm.databinding.FragmentHomeBinding
 
-class AreeParcheggioFragment : Fragment() {
+class ParkMeFragment : Fragment() {
 
-    private var _binding: FragmentGalleryBinding? = null
+    private var _binding: FragmentHomeBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -22,14 +22,14 @@ class AreeParcheggioFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val galleryViewModel =
-            ViewModelProvider(this).get(AreeParcheggioViewModel::class.java)
+        val homeViewModel =
+            ViewModelProvider(this).get(ParkMe::class.java)
 
-        _binding = FragmentGalleryBinding.inflate(inflater, container, false)
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textGallery
-        galleryViewModel.text.observe(viewLifecycleOwner) {
+        val textView: TextView = binding.textHome
+        homeViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
         return root

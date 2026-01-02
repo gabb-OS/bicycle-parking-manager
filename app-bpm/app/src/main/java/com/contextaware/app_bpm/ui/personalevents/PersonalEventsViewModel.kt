@@ -1,4 +1,4 @@
-package com.contextaware.app_bpm.ui.eventipersonali
+package com.contextaware.app_bpm.ui.personalevents
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
