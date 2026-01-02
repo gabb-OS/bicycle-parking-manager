@@ -220,7 +220,9 @@ export class LineChartComponent {
         axisLabel: {
           rotate: 45,
           fontSize: 10,
-          interval: 0, // Show all labels for daily data
+          autoSkip: true,         // to improve readability, selects only some labels to show
+          autoSkipPadding: 25,    // minimum padding between labels
+          hideOverlap: true,      // forces first and last label
         },
         boundaryGap: true, // Required for bar charts
       };
