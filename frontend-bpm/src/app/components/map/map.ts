@@ -73,6 +73,12 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   isHeatmapEnabled = input<boolean>(false);
 
+  /**
+   * Input signal for clustering visualization toggle.
+   * When true, the map should display parking areas with clustering.
+   */
+  isClusteringEnabled = input<boolean>(false);
+
   constructor() {
     // Effect to update parking areas layer when input changes
     effect(() => {

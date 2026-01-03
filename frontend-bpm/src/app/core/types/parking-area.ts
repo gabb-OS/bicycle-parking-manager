@@ -6,6 +6,7 @@ export interface ParkingAreaProperties {
   name: string;
   max_capacity: number;
   residual_capacity: number;
+  occupancy_percentage: number;
 }
 
 // Interface for parking area object from API

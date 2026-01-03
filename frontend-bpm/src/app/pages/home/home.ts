@@ -49,6 +49,9 @@ export class Home implements OnInit, OnDestroy {
   // Signal to hold the heatmap visualization toggle state
   isHeatmapEnabled = signal<boolean>(false);
 
+  // Signal to hold the clustering visualization toggle state
+  isClusteringEnabled = signal<boolean>(false);
+
   ngOnInit(): void {
     // Subscribe to parking areas updates
     this.parkingAreasService.parkingAreasGeoJSON$
@@ -107,6 +110,16 @@ export class Home implements OnInit, OnDestroy {
    */
   onHeatmapToggled(enabled: boolean): void {
     this.isHeatmapEnabled.set(enabled);
+  }
+
+  /**
+   * Handles the clustering toggle event from the data-visualization component.
+   * Updates the isClusteringEnabled signal to be passed to the map.
+   *
+   * @param enabled - Whether the clustering visualization is enabled
+   */
+  onClusteringToggled(enabled: boolean): void {
+    this.isClusteringEnabled.set(enabled);
   }
 
   /**

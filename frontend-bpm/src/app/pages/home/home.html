@@ -4,13 +4,15 @@
             [parkingAreas]="parkingAreas()"
             [parkingEvents]="parkingEvents()"
             [selectedAreaId]="selectedAreaId()"
-            [isHeatmapEnabled]="isHeatmapEnabled()">
+            [isHeatmapEnabled]="isHeatmapEnabled()"
+            [isClusteringEnabled]="isClusteringEnabled()">
         </app-map>
     </div>
     <div class="col px-4">
         <div class="row">
             <app-data-visualization
-                (heatmapToggled)="onHeatmapToggled($event)">
+                (heatmapToggled)="onHeatmapToggled($event)"
+                (clusteringToggled)="onClusteringToggled($event)">
             </app-data-visualization>
         </div>
         <div class="row mt-4">
