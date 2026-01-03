@@ -10,7 +10,7 @@
             android:title="@string/menu_parking_event_trigger" />
         <item
             android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/baseline_format_list_bulleted_24"
             android:title="@string/menu_parking_areas" />
         <item
             android:id="@+id/nav_slideshow"
