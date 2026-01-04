@@ -168,6 +168,7 @@ def seed_parking_events():
         area_id = props.get('parking_area_id')
         start_str = props.get('start_time')
         end_str = props.get('end_time')
+        event_type_str = props.get('event_type', 'park')  # Default to 'park' if not specified
 
         # Idempotency Check: 
         # If we already have an event with this specific ID (or combo of user+time), skip.
@@ -198,10 +199,15 @@ def seed_parking_events():
             print(f"❌ Geometry error for event {event_id}: {e}")
             continue
 
+        # Determine EventType from the event_type field
+        if event_type_str == 'leave':
+            event_type = EventType.LEAVE
+        else:
+            event_type = EventType.PARK
+
         # Create Instance
-        # We default Type to PARK based on the data structure
         new_event = ParkingEvent(
-            type=EventType.PARK, 
+            type=event_type, 
             location_point=wkt_geom,
             user_id=user_id,
             parking_area_id=area_id,
@@ -211,6 +217,12 @@ def seed_parking_events():
 
         db.session.add(new_event)
         added_count += 1
+
+        # If this is an active park event (no end_time), update the parking area's residual capacity
+        if event_type == EventType.PARK and end_dt is None:
+            parking_area = ParkingArea.query.get(area_id)
+            if parking_area and parking_area.residual_capacity > 0:
+                parking_area.residual_capacity -= 1
 
     try:
         db.session.commit()

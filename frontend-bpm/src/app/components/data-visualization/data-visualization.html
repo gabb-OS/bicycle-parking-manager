@@ -1,0 +1,23 @@
+<div class="data-visualization-container">
+    <h6 class="mb-3">Visualizzazione Dati</h6>
+    <div class="form-check form-switch">
+        <input
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+            id="heatmapSwitch"
+            [checked]="isHeatmapEnabled"
+            (change)="onHeatmapToggle($event)">
+        <label class="form-check-label" for="heatmapSwitch">Abilita Heatmap</label>
+    </div>
+    <div class="form-check form-switch mt-2">
+        <input
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+            id="clusteringSwitch"
+            [checked]="isClusteringEnabled"
+            (change)="onClusteringToggle($event)">
+        <label class="form-check-label" for="clusteringSwitch">Abilita Clustering Aree</label>
+    </div>
+</div>

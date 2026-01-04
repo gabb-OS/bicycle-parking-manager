@@ -23,7 +23,7 @@ export class MapUtils {
    * The color is calculated using linear interpolation between green and red
    * based on the occupancy ratio: (maxCapacity - residualCapacity) / maxCapacity
    */
-  static getCapacityColor(residualCapacity: number, maxCapacity: number): string {
+  static getCapacityColor(residualCapacity: number, maxCapacity: number, opacity: number = 0.8): string {
     if (maxCapacity === 0) return 'rgba(128, 128, 128, 0.8)'; // Gray for invalid capacity
 
     const occupancyRatio = 1 - (residualCapacity / maxCapacity);
@@ -33,7 +33,7 @@ export class MapUtils {
     const red = Math.round(255 * clampedRatio);
     const green = Math.round(150 * (1 - clampedRatio));
 
-    return `rgba(${red}, ${green}, 0, 0.8)`;
+    return `rgba(${red}, ${green}, 0, ${opacity})`;
   }
 
 }

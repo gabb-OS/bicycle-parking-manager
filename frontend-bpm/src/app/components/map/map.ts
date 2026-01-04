@@ -6,11 +6,18 @@ import OSM from 'ol/source/OSM';
 import { fromLonLat } from 'ol/proj';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
+import HeatmapLayer from 'ol/layer/Heatmap';
+import Cluster from 'ol/source/Cluster';
 import GeoJSON from 'ol/format/GeoJSON';
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
+import { getCenter } from 'ol/extent';
 import Style from 'ol/style/Style';
 import Icon from 'ol/style/Icon';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
+import CircleStyle from 'ol/style/Circle';
+import Text from 'ol/style/Text';
 import { ParkingAreasGeoJSON } from '@core/types/parking-area';
 import { ParkingEventsGeoJSON } from '@core/types/parking-event';
 import { MapUtils } from '@core/utils/map.utils';
@@ -66,6 +73,18 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   selectedAreaId = input<number | null>(null);
 
+  /**
+   * Input signal for heatmap visualization toggle.
+   * When true, the map should display a heatmap visualization.
+   */
+  isHeatmapEnabled = input<boolean>(false);
+
+  /**
+   * Input signal for clustering visualization toggle.
+   * When true, the map should display parking areas with clustering.
+   */
+  isClusteringEnabled = input<boolean>(false);
+
   constructor() {
     // Effect to update parking areas layer when input changes
     effect(() => {
@@ -80,16 +99,34 @@ export class MapComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Effect to update parking events layer when input changes
+    // Effect to update parking events layer and heatmap layer when input changes
     effect(() => {
       const events = this.parkingEvents();
-      if (events && this.parkingEventsLayer) {
+      const isHeatmapEnabled = this.isHeatmapEnabled();
+
+      if (events) {
         const features = new GeoJSON().readFeatures(events, {
           dataProjection: 'EPSG:4326',
           featureProjection: 'EPSG:3857'
         });
-        this.parkingEventsLayer.getSource()?.clear();
-        this.parkingEventsLayer.getSource()?.addFeatures(features);
+
+        // Update regular events layer
+        if (this.parkingEventsLayer) {
+          this.parkingEventsLayer.getSource()?.clear();
+          this.parkingEventsLayer.getSource()?.addFeatures(features);
+          this.parkingEventsLayer.setVisible(!isHeatmapEnabled);
+        }
+
+        // Update heatmap layer with the same features
+        if (this.heatmapLayer) {
+          const heatmapFeatures = new GeoJSON().readFeatures(events, {
+            dataProjection: 'EPSG:4326',
+            featureProjection: 'EPSG:3857'
+          });
+          this.heatmapLayer.getSource()?.clear();
+          this.heatmapLayer.getSource()?.addFeatures(heatmapFeatures);
+          this.heatmapLayer.setVisible(isHeatmapEnabled);
+        }
       }
     });
 
@@ -99,6 +136,60 @@ export class MapComponent implements OnInit, OnDestroy {
       // Trigger a style refresh by updating the layer
       if (this.parkingAreasLayer) {
         this.parkingAreasLayer.changed();
+      }
+    });
+
+    // Effect to handle clustering of parking areas
+    effect(() => {
+      const areas = this.parkingAreas();
+      const isClusteringEnabled = this.isClusteringEnabled();
+
+      if (areas) {
+        // Transform Parking Area Polygons to Points (Centroids) with capacity data
+        // to be used for clustering
+        const pointFeatures = new GeoJSON().readFeatures(areas, {
+          dataProjection: 'EPSG:4326',
+          featureProjection: 'EPSG:3857'
+        }).map((polygonFeature: any) => {
+          // Get the geometry (Polygon) and calculate centroid
+          const geometry = polygonFeature.getGeometry();
+          const extent = geometry.getExtent();
+          const center = getCenter(extent);
+
+          // Get capacity data from properties
+          const props = polygonFeature.getProperties();
+          const residualCapacity = props.residual_capacity || 0;
+          const maxCapacity = props.max_capacity || 0;
+
+          // Create a new Point feature at the centroid
+          const pointFeature = new Feature(new Point(center));
+
+          // Store capacity data for cluster aggregation
+          pointFeature.setProperties({
+            residualCapacity: residualCapacity,
+            maxCapacity: maxCapacity,
+            areaId: props.id,
+            name: props.name
+          });
+
+          return pointFeature;
+        });
+
+        // Update the Cluster Source
+        this.clusterSource.getSource()?.clear();
+        this.clusterSource.getSource()?.addFeatures(pointFeatures);
+      }
+
+      // Toggle visibility based on clustering state
+      this.clusterLayer.setVisible(isClusteringEnabled);
+
+      // Hide the original polygon layer when clustering is active
+      if (this.parkingAreasLayer) {
+        this.parkingAreasLayer.setVisible(!isClusteringEnabled);
+      }
+
+      if (this.parkingEventsLayer) {
+        this.parkingEventsLayer.setVisible(!isClusteringEnabled);
       }
     });
   }
@@ -218,6 +309,89 @@ export class MapComponent implements OnInit, OnDestroy {
   });
 
   /**
+   * Heatmap layer for displaying parking event density.
+   * Shows crowded areas based on parking event concentration.
+   * Hidden by default, toggled via isHeatmapEnabled input.
+   */
+  private heatmapLayer = new HeatmapLayer({
+    source: new VectorSource(),
+    blur: 15,
+    radius: 10,
+    weight: () => 1,
+    visible: false
+  });
+
+  /**
+   * Cluster source for grouping nearby parking area centroids.
+   * Groups features within 40 pixels of each other.
+   */
+  private clusterSource = new Cluster({
+    distance: 40,
+    minDistance: 20,
+    source: new VectorSource()
+  });
+
+  /**
+   * Style function for cluster features.
+   * Displays the total number of parked bicycles in the cluster.
+   *
+   * @param feature - The cluster feature containing grouped point features
+   * @returns Style object for rendering the cluster
+   */
+  private clusterStyleFunction = (feature: any): Style => {
+    const features = feature.get('features');
+
+    // Sum up the capacities from all areas in this cluster
+    let totalResidualCapacity = 0;
+    let totalMaxCapacity = 0;
+    features.forEach((f: any) => {
+      totalResidualCapacity += f.get('residualCapacity') || 0;
+      totalMaxCapacity += f.get('maxCapacity') || 0;
+    });
+
+    // Calculate total parked bikes for display
+    const totalBikes = totalMaxCapacity - totalResidualCapacity;
+
+    // Dynamic radius based on the number of bikes
+    const radius = Math.min(15 + Math.sqrt(totalBikes) * 2, 40);
+
+    // Color based on aggregated capacity using the same logic as areas
+    const color = MapUtils.getCapacityColor(totalResidualCapacity, totalMaxCapacity, 0.9);
+
+    return new Style({
+      image: new CircleStyle({
+        radius: radius,
+        stroke: new Stroke({
+          color: '#fff',
+          width: 2
+        }),
+        fill: new Fill({
+          color: color
+        })
+      }),
+      text: new Text({
+        text: totalBikes.toString(),
+        fill: new Fill({
+          color: '#fff'
+        }),
+        font: 'bold 12px sans-serif'
+      })
+    });
+  };
+
+  /**
+   * Vector layer for displaying clustered parking area centroids.
+   * Shows the absolute number of parked bicycles per cluster.
+   * Hidden by default, toggled via isClusteringEnabled input.
+   */
+  private clusterLayer = new VectorLayer({
+    source: this.clusterSource,
+    style: this.clusterStyleFunction,
+    visible: false,
+    zIndex: 10
+  });
+
+  /**
    * Component initialization lifecycle hook.
    *
    * @description
@@ -228,7 +402,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.map = new Map({
       target: 'map',
       view: this.view,
-      layers: [this.osmLayer, this.parkingAreasLayer, this.parkingEventsLayer]
+      layers: [this.osmLayer, this.parkingAreasLayer, this.parkingEventsLayer, this.heatmapLayer, this.clusterLayer]
     });
   }
 

@@ -8,7 +8,8 @@
         "user_id": 1,
         "parking_area_id": 4,
         "start_time": "2025-10-02T10:00:00Z",
-        "end_time": "2025-10-02T12:30:00Z"
+        "end_time": "2025-10-02T12:30:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -25,7 +26,8 @@
         "user_id": 2,
         "parking_area_id": 1,
         "start_time": "2025-10-02T11:30:00Z",
-        "end_time": "2025-10-02T15:00:00Z"
+        "end_time": "2025-10-02T15:00:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -42,7 +44,8 @@
         "user_id": 1,
         "parking_area_id": 3,
         "start_time": "2025-10-03T14:30:00Z",
-        "end_time": "2025-10-03T15:15:00Z"
+        "end_time": "2025-10-03T15:15:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -59,7 +62,8 @@
         "user_id": 2,
         "parking_area_id": 4,
         "start_time": "2025-10-04T09:00:00Z",
-        "end_time": "2025-10-04T13:00:00Z"
+        "end_time": "2025-10-04T13:00:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -76,7 +80,8 @@
         "user_id": 1,
         "parking_area_id": 1,
         "start_time": "2025-10-05T10:00:00Z",
-        "end_time": "2025-10-05T12:00:00Z"
+        "end_time": "2025-10-05T12:00:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -93,7 +98,8 @@
         "user_id": 2,
         "parking_area_id": 2,
         "start_time": "2025-10-05T15:00:00Z",
-        "end_time": "2025-10-05T17:30:00Z"
+        "end_time": "2025-10-05T17:30:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -110,7 +116,8 @@
         "user_id": 1,
         "parking_area_id": 2,
         "start_time": "2025-10-06T15:00:00Z",
-        "end_time": "2025-10-06T19:00:00Z"
+        "end_time": "2025-10-06T19:00:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -127,7 +134,8 @@
         "user_id": 2,
         "parking_area_id": 3,
         "start_time": "2025-10-07T08:00:00Z",
-        "end_time": "2025-10-07T11:00:00Z"
+        "end_time": "2025-10-07T11:00:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -144,7 +152,8 @@
         "user_id": 1,
         "parking_area_id": 4,
         "start_time": "2025-10-08T09:00:00Z",
-        "end_time": "2025-10-08T10:45:00Z"
+        "end_time": "2025-10-08T10:45:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -161,7 +170,8 @@
         "user_id": 2,
         "parking_area_id": 1,
         "start_time": "2025-10-09T12:00:00Z",
-        "end_time": "2025-10-09T12:30:00Z"
+        "end_time": "2025-10-09T12:30:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -178,7 +188,8 @@
         "user_id": 1,
         "parking_area_id": 1,
         "start_time": "2025-10-10T12:45:00Z",
-        "end_time": "2025-10-10T14:45:00Z"
+        "end_time": "2025-10-10T14:45:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -195,7 +206,8 @@
         "user_id": 2,
         "parking_area_id": 2,
         "start_time": "2025-10-11T13:00:00Z",
-        "end_time": "2025-10-11T17:00:00Z"
+        "end_time": "2025-10-11T17:00:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -212,7 +224,8 @@
         "user_id": 1,
         "parking_area_id": 4,
         "start_time": "2025-10-11T16:00:00Z",
-        "end_time": "2025-10-12T08:00:00Z"
+        "end_time": "2025-10-12T08:00:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -229,7 +242,8 @@
         "user_id": 2,
         "parking_area_id": 3,
         "start_time": "2025-11-01T10:00:00Z",
-        "end_time": "2025-11-01T11:00:00Z"
+        "end_time": "2025-11-01T11:00:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -246,7 +260,8 @@
         "user_id": 1,
         "parking_area_id": 3,
         "start_time": "2025-11-02T11:00:00Z",
-        "end_time": "2025-11-02T14:00:00Z"
+        "end_time": "2025-11-02T14:00:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -263,7 +278,8 @@
         "user_id": 2,
         "parking_area_id": 4,
         "start_time": "2025-11-03T13:00:00Z",
-        "end_time": "2025-11-03T15:30:00Z"
+        "end_time": "2025-11-03T15:30:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -280,7 +296,8 @@
         "user_id": 1,
         "parking_area_id": 1,
         "start_time": "2025-11-04T16:00:00Z",
-        "end_time": "2025-11-04T18:00:00Z"
+        "end_time": "2025-11-04T18:00:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -297,7 +314,8 @@
         "user_id": 2,
         "parking_area_id": 2,
         "start_time": "2025-11-05T17:30:00Z",
-        "end_time": "2025-11-05T20:00:00Z"
+        "end_time": "2025-11-05T20:00:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -314,7 +332,8 @@
         "user_id": 1,
         "parking_area_id": 2,
         "start_time": "2025-11-05T20:00:00Z",
-        "end_time": "2025-11-05T21:15:00Z"
+        "end_time": "2025-11-05T21:15:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
@@ -331,13 +350,158 @@
         "user_id": 2,
         "parking_area_id": 3,
         "start_time": "2025-11-07T08:30:00Z",
-        "end_time": "2025-11-07T12:00:00Z"
+        "end_time": "2025-11-07T12:00:00Z",
+        "event_type": "leave"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           11.355180,
           44.499270
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 21,
+        "user_id": 1,
+        "parking_area_id": 1,
+        "start_time": "2026-01-03T08:30:00Z",
+        "end_time": null,
+        "event_type": "park"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.355740,
+          44.498800
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 22,
+        "user_id": 2,
+        "parking_area_id": 2,
+        "start_time": "2026-01-03T09:00:00Z",
+        "end_time": null,
+        "event_type": "park"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.354850,
+          44.498900
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 23,
+        "user_id": 1,
+        "parking_area_id": 7,
+        "start_time": "2026-01-03T09:15:00Z",
+        "end_time": null,
+        "event_type": "park"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.357000,
+          44.500900
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 24,
+        "user_id": 2,
+        "parking_area_id": 8,
+        "start_time": "2026-01-03T09:30:00Z",
+        "end_time": null,
+        "event_type": "park"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.356330,
+          44.497200
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 25,
+        "user_id": 1,
+        "parking_area_id": 5,
+        "start_time": "2026-01-03T10:00:00Z",
+        "end_time": null,
+        "event_type": "park"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.353300,
+          44.497500
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 26,
+        "user_id": 2,
+        "parking_area_id": 6,
+        "start_time": "2026-01-03T10:15:00Z",
+        "end_time": null,
+        "event_type": "park"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.352200,
+          44.497000
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 27,
+        "user_id": 1,
+        "parking_area_id": 10,
+        "start_time": "2026-01-03T10:30:00Z",
+        "end_time": null,
+        "event_type": "park"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.356100,
+          44.496830
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 28,
+        "user_id": 2,
+        "parking_area_id": 9,
+        "start_time": "2026-01-03T10:45:00Z",
+        "end_time": null,
+        "event_type": "park"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.356250,
+          44.496320
         ]
       }
     }
