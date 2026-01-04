@@ -26,7 +26,7 @@ class PersonalEventsAdapter(private var events: List<PersonalEvent>) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val event = events[position]
-        holder.typeTextView.text = event.type
+        holder.typeTextView.text = event.type.name
         holder.parkingIdTextView.text = "Area ID: ${event.parkingAreaId}"
         
         //TODO: Check date format
