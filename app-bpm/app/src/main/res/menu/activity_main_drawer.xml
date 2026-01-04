@@ -14,7 +14,7 @@
             android:title="@string/menu_parking_areas" />
         <item
             android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/outline_accessibility_new_24"
             android:title="@string/menu_personal_parking_events" />
     </group>
 </menu>

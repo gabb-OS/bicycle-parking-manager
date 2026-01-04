@@ -10,4 +10,8 @@
     <string name="menu_parking_event_trigger">Parcheggiami!</string>
     <string name="menu_parking_areas">Aree Parcheggio</string>
     <string name="menu_personal_parking_events">Eventi Personali</string>
+    <string name="start_time">Data inizio parcheggio</string>
+    <string name="end_time">Data fine parcheggio</string>
+    <string name="parking_area">Area ID</string>
+    <string name="parking_event_type">Tipo di evento</string>
 </resources>
