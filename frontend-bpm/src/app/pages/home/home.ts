@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { MapComponent } from '@components/map/map';
 import { Filtersbar } from "@components/filtersbar/filtersbar";
 import { LineChartComponent } from '@components/line-chart/line-chart';
@@ -21,6 +21,11 @@ import { Subject, take, takeUntil } from 'rxjs';
 })
 export class Home implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+
+  /**
+   * Reference to the filtersbar component for programmatic reset.
+   */
+  @ViewChild(Filtersbar) private filtersbar!: Filtersbar;
 
   constructor(private parkingAreasService: ParkinAreasService,
               private parkingEventsService: ParkingEventsService) {}
@@ -116,21 +121,40 @@ export class Home implements OnInit, OnDestroy {
   /**
    * Handles the heatmap toggle event from the data-visualization component.
    * Updates the isHeatmapEnabled signal to be passed to the map.
+   * When enabled, clears current filters to show all data.
    *
    * @param enabled - Whether the heatmap visualization is enabled
    */
   onHeatmapToggled(enabled: boolean): void {
     this.isHeatmapEnabled.set(enabled);
+    if (enabled) {
+      this.clearFilters();
+    }
   }
 
   /**
    * Handles the clustering toggle event from the data-visualization component.
    * Updates the isClusteringEnabled signal to be passed to the map.
+   * When enabled, clears current filters to show all data.
    *
    * @param enabled - Whether the clustering visualization is enabled
    */
   onClusteringToggled(enabled: boolean): void {
     this.isClusteringEnabled.set(enabled);
+    if (enabled) {
+      this.clearFilters();
+    }
+  }
+
+  /**
+   * Clears all active filters and resets the filtersbar form.
+   * Used when data visualization toggles are enabled to ensure
+   * visualizations always show all data.
+   */
+  private clearFilters(): void {
+    if (this.filtersbar) {
+      this.filtersbar.onReset();
+    }
   }
 
   /**
