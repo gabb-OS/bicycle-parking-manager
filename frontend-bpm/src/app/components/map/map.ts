@@ -187,6 +187,10 @@ export class MapComponent implements OnInit, OnDestroy {
       if (this.parkingAreasLayer) {
         this.parkingAreasLayer.setVisible(!isClusteringEnabled);
       }
+
+      if (this.parkingEventsLayer) {
+        this.parkingEventsLayer.setVisible(!isClusteringEnabled);
+      }
     });
   }
 
