@@ -9,7 +9,7 @@ import com.contextaware.app_bpm.data.model.ParkingEvent
 import com.contextaware.app_bpm.data.model.ParkingEventType
 import com.contextaware.app_bpm.data.network.RetrofitClient
 import kotlinx.coroutines.launch
-import java.time.Instant
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class ParkMeViewModel : ViewModel() {
@@ -34,8 +34,8 @@ class ParkMeViewModel : ViewModel() {
         val currentIsParking = _isParking.value ?: true
         val eventType = if (currentIsParking) ParkingEventType.PARK else ParkingEventType.LEAVE
 
-        // Use ISO_INSTANT formatter (e.g. 2023-10-27T10:00:00.123Z)
-        val timestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
+        // Use ISO_LOCAL_DATE_TIME formatter (e.g. 2023-10-27T10:00:00.123)
+        val timestamp = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now())
 
         // Create Event
         val event = ParkingEvent(

@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Blueprint, jsonify, request
 from geoalchemy2 import WKTElement
 from geoalchemy2 import functions as geo_func
@@ -16,13 +17,13 @@ events_bp = Blueprint('events', __name__, url_prefix='/events')
 #  - user_id
 #  - longitude, latitude (gps coordinates)
 #  - type ("park" or "leave")
-#  - timestamp (optional)
+#  - timestamp
 @events_bp.route("/parking", methods=["POST"])
 def parking_event():
     data = request.get_json()
     
     # Validate required fields
-    required_fields = ['user_id', 'longitude', 'latitude', 'type']
+    required_fields = ['user_id', 'longitude', 'latitude', 'type', 'timestamp']
     for field in required_fields:
         if field not in data:
             return jsonify({"error": f"Missing required field: {field}"}), 400
@@ -32,6 +33,12 @@ def parking_event():
         event_type = EventType(data['type'])
     except ValueError:
         return jsonify({"error": "Invalid event type. Must be 'park' or 'leave'"}), 400
+    
+    # Expexts an ISO_LOCAL_DATE_TIME (ISO-8601) - e.g., "2026-01-05T15:48:45"
+    try:
+        current_timestamp = datetime.fromisoformat(data['timestamp'])
+    except ValueError:
+        return jsonify({"error": "Invalid timestamp format."}), 400
     
     # Create point geometry from coordinates
     longitude = data['longitude']
@@ -50,20 +57,37 @@ def parking_event():
     if event_type == EventType.PARK:
         if not parking_area.park_bicycle():
             return jsonify({"error": "Parking area is full"}), 400
-    else:  # LEAVE
+
+        event = ParkingEvent(
+            type=event_type,
+            location_point=location_point,
+            user_id=data['user_id'],
+            parking_area_id=parking_area.id,
+            start_time=current_timestamp
+        )
+        db.session.add(event)
+
+    else:  # LEAVE        
+        # Find active PARK event for this user/area with a prior start_time
+        existing_event = ParkingEvent.query.filter(
+            ParkingEvent.user_id == data['user_id'],
+            ParkingEvent.type == EventType.PARK,
+            ParkingEvent.parking_area_id == parking_area.id,
+            ParkingEvent.start_time <= current_timestamp,
+            ParkingEvent.end_time == None 
+        ).order_by(ParkingEvent.start_time.desc()).first()
+
+        if existing_event is None:
+            return jsonify({"error": "No corresponding PARK event found"}), 400
+        
         if not parking_area.leave_parking():
             return jsonify({"error": "Parking area is already empty"}), 400
-    
-    # Create the event
-    event = ParkingEvent(
-        type=event_type,
-        location_point=location_point,
-        user_id=data['user_id'],
-        parking_area_id=parking_area.id,
-        start_time=data.get('start_time')  # Optional, defaults to now
-    )
-    
-    db.session.add(event)
+        
+        # Modify the existing event to: type is now LEAVE and updating end_time
+        existing_event.type = EventType.LEAVE
+        existing_event.end_time = current_timestamp
+        event = existing_event
+
     db.session.commit()
     
     return jsonify({
