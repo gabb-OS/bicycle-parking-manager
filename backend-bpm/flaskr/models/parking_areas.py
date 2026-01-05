@@ -1,5 +1,6 @@
 from flaskr.extensions import db
 from geoalchemy2 import Geometry
+from geoalchemy2 import functions as geo_func
 from geoalchemy2.shape import to_shape
 import json
 
@@ -59,6 +60,13 @@ class ParkingArea(db.Model):
     @staticmethod
     def get_by_name(name):
         return ParkingArea.query.filter(ParkingArea.name == name).first()
+    
+    @staticmethod
+    def get_by_locationpoint(location_point):
+        """Returns the parking area that contains a given [lon, lat] point; returns None otherwise"""
+        return ParkingArea.query.filter(
+            geo_func.ST_Contains(ParkingArea.location_area, location_point)
+            ).first()
 
     @staticmethod
     def get_all():

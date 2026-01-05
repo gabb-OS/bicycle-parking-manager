@@ -1,7 +1,6 @@
 from datetime import datetime
 from flask import Blueprint, jsonify, request
 from geoalchemy2 import WKTElement
-from geoalchemy2 import functions as geo_func
 from flaskr.extensions import db
 from flaskr.models.events import ParkingEvent, EventType
 from flaskr.models.parking_areas import ParkingArea
@@ -44,11 +43,7 @@ def parking_event():
     longitude = data['longitude']
     latitude = data['latitude']
     location_point = WKTElement(f'POINT({longitude} {latitude})', srid=4326)
-    
-    # Find the parking area that contains this point
-    parking_area = ParkingArea.query.filter(
-        geo_func.ST_Contains(ParkingArea.location_area, location_point)
-    ).first()
+    parking_area = ParkingArea.get_by_locationpoint(location_point)
     
     if parking_area is None:
         return jsonify({"error": "Location is not within any parking area"}), 400
@@ -69,13 +64,11 @@ def parking_event():
 
     else:  # LEAVE        
         # Find active PARK event for this user/area with a prior start_time
-        existing_event = ParkingEvent.query.filter(
-            ParkingEvent.user_id == data['user_id'],
-            ParkingEvent.type == EventType.PARK,
-            ParkingEvent.parking_area_id == parking_area.id,
-            ParkingEvent.start_time <= current_timestamp,
-            ParkingEvent.end_time == None 
-        ).order_by(ParkingEvent.start_time.desc()).first()
+        existing_event = ParkingEvent.get_active_park_event(
+            data['user_id'], 
+            parking_area.id, 
+            current_timestamp
+        )
 
         if existing_event is None:
             return jsonify({"error": "No corresponding PARK event found"}), 400
