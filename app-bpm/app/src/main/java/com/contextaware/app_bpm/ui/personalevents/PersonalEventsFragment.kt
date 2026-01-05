@@ -8,11 +8,11 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.contextaware.app_bpm.databinding.FragmentSlideshowBinding
+import com.contextaware.app_bpm.databinding.FragmentPersonaleventsBinding
 
 class PersonalEventsFragment : Fragment() {
 
-    private var _binding: FragmentSlideshowBinding? = null
+    private var _binding: FragmentPersonaleventsBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: PersonalEventsAdapter
 
@@ -24,7 +24,7 @@ class PersonalEventsFragment : Fragment() {
         val viewModel =
             ViewModelProvider(this).get(PersonalEventsViewModel::class.java)
 
-        _binding = FragmentSlideshowBinding.inflate(inflater, container, false)
+        _binding = FragmentPersonaleventsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         // Setup RecyclerView

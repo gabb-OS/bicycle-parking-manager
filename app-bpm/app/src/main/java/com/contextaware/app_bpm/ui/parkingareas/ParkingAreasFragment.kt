@@ -8,11 +8,11 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.contextaware.app_bpm.databinding.FragmentGalleryBinding
+import com.contextaware.app_bpm.databinding.FragmentParkingareasBinding
 
 class ParkingAreasFragment : Fragment() {
 
-    private var _binding: FragmentGalleryBinding? = null
+    private var _binding: FragmentParkingareasBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: ParkingAreasAdapter
 
@@ -24,7 +24,7 @@ class ParkingAreasFragment : Fragment() {
         val parkingViewModel =
             ViewModelProvider(this).get(ParkingAreasViewModel::class.java)
 
-        _binding = FragmentGalleryBinding.inflate(inflater, container, false)
+        _binding = FragmentParkingareasBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         // Setup RecyclerView

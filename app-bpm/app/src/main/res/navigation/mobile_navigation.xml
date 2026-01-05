@@ -15,11 +15,11 @@
         android:id="@+id/nav_gallery"
         android:name="com.contextaware.app_bpm.ui.parkingareas.ParkingAreasFragment"
         android:label="@string/menu_parking_areas"
-        tools:layout="@layout/fragment_gallery" />
+        tools:layout="@layout/fragment_parkingareas" />
 
     <fragment
         android:id="@+id/nav_slideshow"
         android:name="com.contextaware.app_bpm.ui.personalevents.PersonalEventsFragment"
         android:label="@string/menu_personal_parking_events"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_personalevents" />
 </navigation>
