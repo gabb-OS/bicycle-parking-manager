@@ -37,7 +37,7 @@ def parking_event():
     try:
         current_timestamp = datetime.fromisoformat(data['timestamp'])
     except ValueError:
-        return jsonify({"error": "Invalid timestamp format."}), 400
+        return jsonify({"error": "Invalid timestamp format"}), 400
     
     # Create point geometry from coordinates
     longitude = data['longitude']
@@ -71,7 +71,7 @@ def parking_event():
         )
 
         if existing_event is None:
-            return jsonify({"error": "No corresponding PARK event found"}), 400
+            return jsonify({"error": "No corresponding active park event found"}), 400
         
         if not parking_area.leave_parking():
             return jsonify({"error": "Parking area is already empty"}), 400
@@ -85,8 +85,7 @@ def parking_event():
     
     return jsonify({
         "message": f"Bicycle {event_type.value} event recorded successfully",
-        "event": event.to_dict(),
-        "parking_area": parking_area.to_dict()
+        "parking_area": parking_area.name
     }), 201
 
 

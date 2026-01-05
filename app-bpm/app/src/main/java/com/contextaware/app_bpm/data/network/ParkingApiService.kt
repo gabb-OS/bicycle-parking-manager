@@ -2,6 +2,7 @@ package com.contextaware.app_bpm.data.network
 
 import com.contextaware.app_bpm.data.model.ParkingArea
 import com.contextaware.app_bpm.data.model.ParkingEvent
+import com.contextaware.app_bpm.data.model.ParkingResponse
 import com.contextaware.app_bpm.data.model.PersonalEvent
 import retrofit2.Response
 import retrofit2.http.Body
@@ -17,5 +18,5 @@ interface ParkingApiService {
     suspend fun getUserEvents(@Path("user_id") userId: Int): Response<List<PersonalEvent>>
 
     @POST("events/parking")
-    suspend fun sendParkingEvent(@Body event: ParkingEvent): Response<Void>
+    suspend fun sendParkingEvent(@Body event: ParkingEvent): Response<ParkingResponse>
 }

@@ -38,7 +38,7 @@ class ParkMeFragment : Fragment() {
             ) {
                 getCurrentLocationAndSendEvent()
             } else {
-                Toast.makeText(context, "Location permission denied", Toast.LENGTH_SHORT).show()
+                binding.textStatusMessage.text = getString(R.string.location_permission_denied)
             }
         }
 
@@ -66,7 +66,6 @@ class ParkMeFragment : Fragment() {
         // Observe Status Messages
         parkMeViewModel.statusMessage.observe(viewLifecycleOwner) { message ->
             textStatus.text = message
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
 
         buttonPark.setOnClickListener {
@@ -97,10 +96,12 @@ class ParkMeFragment : Fragment() {
         }
     }
 
+    /* Warning: the emulator takes a little time to change the GPS position.
+    * To test this case, wait a little bit for the Android system to update the position correctly*/
     @SuppressLint("MissingPermission")
     private fun getCurrentLocationAndSendEvent() {
         val cancellationTokenSource = CancellationTokenSource()
-        
+
         // Try to get high accuracy current location
         fusedLocationClient.getCurrentLocation(
             Priority.PRIORITY_HIGH_ACCURACY,
@@ -110,7 +111,7 @@ class ParkMeFragment : Fragment() {
                 parkMeViewModel.sendParkingEvent(location)
             }
         }.addOnFailureListener {
-            Toast.makeText(context, "Failed to get location: ${it.message}", Toast.LENGTH_SHORT).show()
+            binding.textStatusMessage.text = "Unable to retrieve current location"
         }
     }
 

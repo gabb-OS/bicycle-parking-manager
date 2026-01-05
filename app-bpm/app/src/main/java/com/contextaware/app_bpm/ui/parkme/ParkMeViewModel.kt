@@ -9,6 +9,7 @@ import com.contextaware.app_bpm.data.model.ParkingEvent
 import com.contextaware.app_bpm.data.model.ParkingEventType
 import com.contextaware.app_bpm.data.network.RetrofitClient
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -50,10 +51,26 @@ class ParkMeViewModel : ViewModel() {
             try {
                 val response = RetrofitClient.instance.sendParkingEvent(event)
                 if (response.isSuccessful) {
-                    _statusMessage.value = "Event sent successfully: ${eventType.name}"
+                    val body = response.body()
+                    if (body != null) {
+                        _statusMessage.value = "${body.message} in ${body.parkingArea}"
+                    } else {
+                        _statusMessage.value = "Event recorded"     //Fallback
+                    }
                     toggleParkingStatus()
                 } else {
-                    _statusMessage.value = "Error sending event: ${response.code()}"
+                    val errorBody = response.errorBody()?.string()
+                    val errorMsg = if (errorBody != null) {
+                        try {
+                            val jsonObject = JSONObject(errorBody)
+                            jsonObject.optString("error", "Unknown error")
+                        } catch (e: Exception) {
+                            "Error parsing response"
+                        }
+                    } else {
+                        "Error: ${response.code()}"
+                    }
+                    _statusMessage.value = errorMsg
                 }
             } catch (e: Exception) {
                 _statusMessage.value = "Connection Error: ${e.message}"
