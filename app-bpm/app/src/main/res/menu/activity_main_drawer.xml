@@ -6,7 +6,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/outline_bike_lane_24"
             android:title="@string/menu_parking_event_trigger" />
         <item
             android:id="@+id/nav_gallery"
