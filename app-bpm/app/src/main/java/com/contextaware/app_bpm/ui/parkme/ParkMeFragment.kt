@@ -16,7 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.contextaware.app_bpm.R
-import com.contextaware.app_bpm.databinding.FragmentHomeBinding
+import com.contextaware.app_bpm.databinding.FragmentParkmeBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -24,7 +24,7 @@ import com.google.android.gms.tasks.CancellationTokenSource
 
 class ParkMeFragment : Fragment() {
 
-    private var _binding: FragmentHomeBinding? = null
+    private var _binding: FragmentParkmeBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var parkMeViewModel: ParkMeViewModel
@@ -50,7 +50,7 @@ class ParkMeFragment : Fragment() {
         parkMeViewModel =
             ViewModelProvider(this).get(ParkMeViewModel::class.java)
 
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _binding = FragmentParkmeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
