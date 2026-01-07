@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.contextaware.app_bpm.data.model.ParkingEvent
 import com.contextaware.app_bpm.data.model.ParkingEventType
+import com.contextaware.app_bpm.data.model.ParkingResponse
 import com.contextaware.app_bpm.data.network.RetrofitClient
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -31,6 +32,17 @@ class ParkMeViewModel : ViewModel() {
         _isParking.value = !(_isParking.value ?: true)
     }
 
+    // New method to handle auto-events
+    fun handleAutoEvent(isParkAction: Boolean, location: Location) {
+        val currentIsParking = _isParking.value ?: true
+        
+        // If current state is ready to PARK (true) and auto-event is Park (true) -> OK
+        // If current state is ready to LEAVE (false) and auto-event is Leave (false) -> OK
+        if (currentIsParking == isParkAction) {
+             sendParkingEvent(location)
+        }
+    }
+
     fun sendParkingEvent(location: Location) {
         val currentIsParking = _isParking.value ?: true
         val eventType = if (currentIsParking) ParkingEventType.PARK else ParkingEventType.LEAVE
@@ -51,7 +63,7 @@ class ParkMeViewModel : ViewModel() {
             try {
                 val response = RetrofitClient.instance.sendParkingEvent(event)
                 if (response.isSuccessful) {
-                    val body = response.body()
+                    val body: ParkingResponse? = response.body()
                     if (body != null) {
                         _statusMessage.value = "${body.message} in ${body.parkingArea}"
                     } else {
