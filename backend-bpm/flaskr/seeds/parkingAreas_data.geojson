@@ -356,6 +356,42 @@
           ]
         ]
       }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 11,
+        "name": "Via Genova - Capolinea 27B",
+        "max_capacity": 5,
+        "residual_capacity": 5
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              11.392248,
+              44.473629
+            ],
+            [
+              11.391589,
+              44.472744
+            ],
+            [
+              11.392185,
+              44.472512
+            ],
+            [
+              11.392860,
+              44.473395
+            ],
+            [
+              11.392248,
+              44.473629
+            ]
+          ]
+        ]
+      }
     }
   ]
 }

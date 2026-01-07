@@ -7,7 +7,19 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
+    <!-- Menu -->
     <string name="menu_parking_event_trigger">Parcheggiami!</string>
     <string name="menu_parking_areas">Aree Parcheggio</string>
     <string name="menu_personal_parking_events">Eventi Personali</string>
+
+    <!-- PersonalEventsFragment -->
+    <string name="start_time">Data inizio parcheggio</string>
+    <string name="end_time">Data fine parcheggio</string>
+    <string name="parking_area">Area ID</string>
+    <string name="parking_event_type">Tipo di evento</string>
+
+    <!-- ParkMeFragment -->
+    <string name="parcheggia">Parcheggia</string>
+    <string name="lasciaparcheggio">Lascia Parcheggio</string>
+    <string name="location_permission_denied">Permessi per la localizzazione negati</string>
 </resources>

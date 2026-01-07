@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.contextaware.app_bpm.ui.parcheggiami.ParcheggiamiFragment"
+        android:name="com.contextaware.app_bpm.ui.parkme.ParkMeFragment"
         android:label="@string/menu_parking_event_trigger"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_parkme" />
 
     <fragment
         android:id="@+id/nav_gallery"
-        android:name="com.contextaware.app_bpm.ui.areeparcheggio.AreeParcheggioFragment"
+        android:name="com.contextaware.app_bpm.ui.parkingareas.ParkingAreasFragment"
         android:label="@string/menu_parking_areas"
-        tools:layout="@layout/fragment_gallery" />
+        tools:layout="@layout/fragment_parkingareas" />
 
     <fragment
         android:id="@+id/nav_slideshow"
-        android:name="com.contextaware.app_bpm.ui.eventipersonali.EventiPersonaliFragment"
+        android:name="com.contextaware.app_bpm.ui.personalevents.PersonalEventsFragment"
         android:label="@string/menu_personal_parking_events"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_personalevents" />
 </navigation>
