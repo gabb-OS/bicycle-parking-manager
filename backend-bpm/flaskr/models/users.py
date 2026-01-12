@@ -4,12 +4,14 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(), unique=True, nullable=False)    
+    username = db.Column(db.String(), unique=True, nullable=True) 
+    email = db.Column(db.String(), unique=True, nullable=False) 
     created_at = db.Column(db.Date, nullable=False)
 
 
-    def __init__(self, username, created_at):
-        self.username = username        
+    def __init__(self, username, email, created_at):
+        self.username = username
+        self.email = email
         self.created_at = created_at        
     
     def register_user_if_not_exist(self):        
@@ -28,7 +30,8 @@ class User(db.Model):
         """Converts the object to a dictionary for JSON responses."""
         return {
             "id": self.id,
-            "username": self.username,
+            "username": self.username if self.username else None,
+            "email": self.email,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
