@@ -43,9 +43,10 @@ def seed_users():
 
     for user_json in users_data:
         username = user_json.get('username')
+        email = user_json.get('email')
         created_at_str = user_json.get('created_at')
 
-        if User.query.filter_by(username=username).first():
+        if User.query.filter_by(email=email).first():
             skipped_count += 1
             continue
 
@@ -56,7 +57,7 @@ def seed_users():
             print(f"❌ Date format error for user {username}")
             continue
 
-        new_user = User(username=username, created_at=date_only)
+        new_user = User(username=username, email=email, created_at=date_only)
         db.session.add(new_user)
         added_count += 1
 
