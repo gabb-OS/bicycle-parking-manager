@@ -22,4 +22,7 @@
     <string name="parcheggia">Parcheggia</string>
     <string name="lasciaparcheggio">Lascia Parcheggio</string>
     <string name="location_permission_denied">Permessi per la localizzazione negati</string>
+
+    <!-- Login/Register -->
+    <string name="login_register">Login/Register</string>
 </resources>

@@ -22,4 +22,17 @@
         android:name="com.contextaware.app_bpm.ui.personalevents.PersonalEventsFragment"
         android:label="@string/menu_personal_parking_events"
         tools:layout="@layout/fragment_personalevents" />
+
+    <fragment
+        android:id="@+id/nav_login"
+        android:name="com.contextaware.app_bpm.ui.login.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_login_to_home"
+            app:destination="@id/nav_home"
+            app:popUpTo="@id/nav_login"
+            app:popUpToInclusive="true" />
+    </fragment>
+
 </navigation>
