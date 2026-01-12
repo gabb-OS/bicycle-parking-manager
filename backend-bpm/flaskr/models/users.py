@@ -1,3 +1,4 @@
+from datetime import date
 from flaskr.extensions import db
 
 class User(db.Model):
@@ -14,17 +15,34 @@ class User(db.Model):
         self.email = email
         self.created_at = created_at        
     
-    def register_user_if_not_exist(self):        
-        db_user = User.query.filter(User.username == self.username).all()
-        if not db_user:
-            db.session.add(self)
-            db.session.commit()
-        
-        return True
-    
+    @staticmethod
+    def get_all():
+        return User.query.all()
+
+    @staticmethod
+    def get_by_email(email):
+        return User.query.filter_by(email=email).first()
+
+    @staticmethod
     def get_by_username(username):        
         db_user = User.query.filter(User.username == username).first()
         return db_user
+    
+    @staticmethod
+    def create_new_user(email, username):
+        """Gestisce la creazione e il salvataggio di un nuovo utente."""
+        new_user = User(
+            username=username,
+            email=email,
+            created_at=date.today()
+        )
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            return new_user, None
+        except Exception as e:
+            db.session.rollback()
+            return None, str(e)
     
     def to_dict(self):
         """Converts the object to a dictionary for JSON responses."""
