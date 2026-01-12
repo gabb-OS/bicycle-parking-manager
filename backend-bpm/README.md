@@ -21,7 +21,7 @@ Here is the "Golden Lifecycle" of a feature, from your laptop (Dev) to the serve
 Run this command from your root folder. It combines your base config with your dev overrides (hot-reloading, exposed ports).
 
 ```bash
-docker compose -f compose.yaml -f docker-compose.dev.yml up -d --build
+docker compose -f compose.yaml -f compose.dev.yaml up -d --build
 ```
 
 #### 2\. The Code-Change Cycle
