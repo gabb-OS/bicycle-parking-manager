@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.contextaware.app_bpm.data.model.ParkingArea
 import com.contextaware.app_bpm.data.network.RetrofitClient
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class ParkingAreasViewModel : ViewModel() {
 
@@ -19,12 +20,23 @@ class ParkingAreasViewModel : ViewModel() {
     fun fetchParkingAreas() {
         viewModelScope.launch {
             try {
-                val response = RetrofitClient.instance.getParkingAreas()
+                val response = RetrofitClient.parkingApi.getParkingAreas()
                 if (response.isSuccessful) {
                     _parkingAreas.value = response.body() ?: emptyList()
                     _statusMessage.value = "Success"
                 } else {
-                    _statusMessage.value = "Error: ${response.code()}"
+                    val errorBody = response.errorBody()?.string()
+                    val errorMsg = if (errorBody != null) {
+                        try {
+                            val jsonObject = JSONObject(errorBody)
+                            jsonObject.optString("error", "Unknown error")
+                        } catch (e: Exception) {
+                            "Error parsing response"
+                        }
+                    } else {
+                        "Error: ${response.code()}"
+                    }
+                    _statusMessage.value = errorMsg
                 }
             } catch (e: Exception) {
                 _statusMessage.value = "Connection Error: ${e.message}"

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.contextaware.app_bpm.data.model.PersonalEvent
 import com.contextaware.app_bpm.data.network.RetrofitClient
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class PersonalEventsViewModel : ViewModel() {
 
@@ -21,14 +22,25 @@ class PersonalEventsViewModel : ViewModel() {
         val userId = 1
         viewModelScope.launch {
             try {
-                val response = RetrofitClient.instance.getUserEvents(userId)
+                val response = RetrofitClient.parkingApi.getUserEvents(userId)
                 if (response.isSuccessful) {
                     val eventsList = response.body() ?: emptyList()
-                    // Newest events first
+                    // Sort events by start time descending (newest first)
                     _events.value = eventsList.sortedByDescending { it.startTime }
                     _statusMessage.value = "Success"
                 } else {
-                    _statusMessage.value = "Error: ${response.code()}"
+                    val errorBody = response.errorBody()?.string()
+                    val errorMsg = if (errorBody != null) {
+                        try {
+                            val jsonObject = JSONObject(errorBody)
+                            jsonObject.optString("error", "Unknown error")
+                        } catch (e: Exception) {
+                            "Error parsing response"
+                        }
+                    } else {
+                        "Error: ${response.code()}"
+                    }
+                    _statusMessage.value = errorMsg
                 }
             } catch (e: Exception) {
                 _statusMessage.value = "Connection Error: ${e.message}"

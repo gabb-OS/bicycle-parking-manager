@@ -61,7 +61,7 @@ class ParkMeViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                val response = RetrofitClient.instance.sendParkingEvent(event)
+                val response = RetrofitClient.parkingApi.sendParkingEvent(event)
                 if (response.isSuccessful) {
                     val body: ParkingResponse? = response.body()
                     if (body != null) {
