@@ -8,3 +8,4 @@ Flask-Migrate
 flask-cors
 gunicorn
 shapely
+firebase-admin

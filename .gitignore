@@ -9,6 +9,7 @@
 *.secret
 *.bak
 *.tmp
+keys/
 
 # Logs
 *.log
@@ -127,3 +128,8 @@ frontend-bpm/*.tsbuildinfo
 **/*.jar
 **/*.war
 **/*.ear
+
+############################
+# APP ANDROID
+############################
+**/google-services.json
