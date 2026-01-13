@@ -20,11 +20,16 @@ events_bp = Blueprint('events', __name__, url_prefix='/events')
 #  - type ("park" or "leave")
 #  - timestamp
 @events_bp.route("/parking", methods=["POST"])
-def parking_event():
+@firebase_guard
+def parking_event(token):
     data = request.get_json()
+
+    # Get correct user     
+    email = token.get('email')
+    user = User.get_by_email(email)
     
     # Validate required fields
-    required_fields = ['user_id', 'longitude', 'latitude', 'type', 'timestamp']
+    required_fields = ['longitude', 'latitude', 'type', 'timestamp']
     for field in required_fields:
         if field not in data:
             return jsonify({"error": f"Missing required field: {field}"}), 400
@@ -58,7 +63,7 @@ def parking_event():
         event = ParkingEvent(
             type=event_type,
             location_point=location_point,
-            user_id=data['user_id'],
+            user_id=user.id,
             parking_area_id=parking_area.id,
             start_time=current_timestamp
         )
@@ -67,7 +72,7 @@ def parking_event():
     else:  # LEAVE        
         # Find active PARK event for this user/area with a prior start_time
         existing_event = ParkingEvent.get_active_park_event(
-            data['user_id'], 
+            user.id, 
             parking_area.id, 
             current_timestamp
         )

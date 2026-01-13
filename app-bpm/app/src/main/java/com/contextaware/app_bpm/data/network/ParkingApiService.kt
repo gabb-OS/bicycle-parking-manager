@@ -18,5 +18,8 @@ interface ParkingApiService {
     suspend fun getUserEvents(@Header("Authorization") authHeader: String): Response<List<PersonalEvent>>
 
     @POST("events/parking")
-    suspend fun sendParkingEvent(@Body event: ParkingEvent): Response<ParkingResponse>
+    suspend fun sendParkingEvent(
+        @Header("Authorization") authHeader: String,
+        @Body event: ParkingEvent
+    ): Response<ParkingResponse>
 }
