@@ -4,6 +4,8 @@ from geoalchemy2 import WKTElement
 from flaskr.extensions import db
 from flaskr.models.events import ParkingEvent, EventType
 from flaskr.models.parking_areas import ParkingArea
+from flaskr.models.users import User
+from flaskr.guards.firebase_guard import firebase_guard
 
 events_bp = Blueprint('events', __name__, url_prefix='/events')
 
@@ -110,9 +112,12 @@ def get_event_by_id(event_id):
 
 
 # Get all user 'parking events' (from the App)
-@events_bp.route("/user/<int:user_id>", methods=["GET"])
-def get_user_parking_events(user_id):
-    events = ParkingEvent.get_by_user(user_id)
+@events_bp.route("/user/personalevents", methods=["GET"])
+@firebase_guard
+def get_user_parking_events(token):
+    email = token.get('email')
+    user = User.get_by_email(email)
+    events = ParkingEvent.get_by_user(user.id)
     return jsonify([event.to_dict() for event in events])
 
 

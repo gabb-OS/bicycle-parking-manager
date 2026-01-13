@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.contextaware.app_bpm.data.model.PersonalEvent
 import com.contextaware.app_bpm.data.network.RetrofitClient
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
@@ -18,14 +19,30 @@ class PersonalEventsViewModel : ViewModel() {
     val statusMessage: LiveData<String> = _statusMessage
 
     fun fetchUserEvents() {
-        //TODO: change Hardcoded user_id = 0
-        val userId = 1
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user == null) {
+            _statusMessage.value = "User not logged in"
+            return
+        }
+
+        user.getIdToken(false).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result.token
+                if (token != null) {
+                    loadEventsFromBackend("Bearer $token")
+                }
+            } else {
+                _statusMessage.value = "Failed to retrieve auth token"
+            }
+        }
+    }
+
+    private fun loadEventsFromBackend(authHeader: String) {
         viewModelScope.launch {
             try {
-                val response = RetrofitClient.parkingApi.getUserEvents(userId)
+                val response = RetrofitClient.parkingApi.getUserEvents(authHeader)
                 if (response.isSuccessful) {
                     val eventsList = response.body() ?: emptyList()
-                    // Sort events by start time descending (newest first)
                     _events.value = eventsList.sortedByDescending { it.startTime }
                     _statusMessage.value = "Success"
                 } else {
@@ -33,7 +50,7 @@ class PersonalEventsViewModel : ViewModel() {
                     val errorMsg = if (errorBody != null) {
                         try {
                             val jsonObject = JSONObject(errorBody)
-                            jsonObject.optString("error", "Unknown error")
+                            jsonObject.optString("error", "Error loading events")
                         } catch (e: Exception) {
                             "Error parsing response"
                         }
