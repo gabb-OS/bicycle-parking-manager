@@ -87,6 +87,19 @@ class ParkingEvent(db.Model):
             "user_id": self.user_id,
             "parking_area_id": self.parking_area_id
         }
+    
+    def to_dict_with_parkingname(self):
+        """Converts the object to a dictionary for JSON responses."""
+        return {
+            "id": self.id,
+            "start_time": self.start_time.isoformat(),
+            "end_time": self.end_time.isoformat() if self.end_time else None,
+            "type": self.type.value,
+            "location_point": self.get_location_geojson(),
+            "user_id": self.user_id,
+            "parking_area_id": self.parking_area_id,
+            "parking_area_name": self.parking_area_name
+        }
 
     def to_geojson_feature(self):
         """Converts the object to a GeoJSON Feature."""
@@ -99,7 +112,7 @@ class ParkingEvent(db.Model):
                 "end_time": self.end_time.isoformat() if self.end_time else None,
                 "type": self.type.value,
                 "user_id": self.user_id,
-                "parking_area_id": self.parking_area_id
+                "parking_area_id": getattr(self, 'parking_area_name', None)
             }
         }
 

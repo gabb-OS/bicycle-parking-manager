@@ -122,9 +122,20 @@ def get_event_by_id(event_id):
 def get_user_parking_events(token):
     email = token.get('email')
     user = User.get_by_email(email)
-    events = ParkingEvent.get_by_user(user.id)
-    return jsonify([event.to_dict() for event in events])
-
+    # Left join that returns user personal events also with relative parking area
+    results = db.session.query(ParkingEvent, ParkingArea.name) \
+        .outerjoin(ParkingArea, ParkingEvent.parking_area_id == ParkingArea.id) \
+        .filter(ParkingEvent.user_id == user.id) \
+        .all()
+    
+    # We want to return parking area name per each returned record
+    events_with_names = []
+    for event, area_name in results:
+        event.parking_area_name = area_name if area_name else "Area non specificata"
+        events_with_names.append(event.to_dict_with_parkingname())
+    
+    return jsonify(events_with_names)
+   
 
 # Get all events for a specific parking area
 @events_bp.route("/area/<int:area_id>", methods=["GET"])

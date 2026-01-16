@@ -14,5 +14,7 @@ data class PersonalEvent(
     @SerializedName("user_id")
     val userId: Int,
     @SerializedName("parking_area_id")
-    val parkingAreaId: Int
+    val parkingAreaId: Int,
+    @SerializedName("parking_area_name")
+    val parkingAreaName: String?
 )
