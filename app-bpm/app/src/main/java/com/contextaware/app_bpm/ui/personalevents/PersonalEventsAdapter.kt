@@ -7,9 +7,16 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.contextaware.app_bpm.R
 import com.contextaware.app_bpm.data.model.PersonalEvent
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class PersonalEventsAdapter(private var events: List<PersonalEvent>) :
     RecyclerView.Adapter<PersonalEventsAdapter.ViewHolder>() {
+
+    // Input format from backend (ISO 8601)
+    private val inputFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+    // Output format for the user
+    private val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val typeTextView: TextView = view.findViewById(R.id.text_event_type)
@@ -27,13 +34,20 @@ class PersonalEventsAdapter(private var events: List<PersonalEvent>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val event = events[position]
         holder.typeTextView.text = event.type.name
-        
-        // Use Area Name instead of ID
         holder.parkingNameTextView.text = event.parkingAreaName ?: "Area ID: ${event.parkingAreaId}"
         
-        // Basic ISO format string display
-        holder.startTimeTextView.text = "Inizio: ${event.startTime}"
-        holder.endTimeTextView.text = "Fine: ${event.endTime ?: "-"}"
+        holder.startTimeTextView.text = "Inizio: ${formatDate(event.startTime)}"
+        holder.endTimeTextView.text = "Fine: ${formatDate(event.endTime)}"
+    }
+
+    private fun formatDate(dateStr: String?): String {
+        if (dateStr == null) return "-"
+        return try {
+            val dateTime = LocalDateTime.parse(dateStr, inputFormatter)
+            dateTime.format(outputFormatter)
+        } catch (e: Exception) {
+            dateStr // Fallback to raw string if parsing fails
+        }
     }
 
     override fun getItemCount() = events.size
