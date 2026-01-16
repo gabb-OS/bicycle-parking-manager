@@ -13,7 +13,7 @@ class PersonalEventsAdapter(private var events: List<PersonalEvent>) :
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val typeTextView: TextView = view.findViewById(R.id.text_event_type)
-        val parkingIdTextView: TextView = view.findViewById(R.id.text_parking_id)
+        val parkingNameTextView: TextView = view.findViewById(R.id.text_parking_id)
         val startTimeTextView: TextView = view.findViewById(R.id.text_start_time)
         val endTimeTextView: TextView = view.findViewById(R.id.text_end_time)
     }
@@ -27,11 +27,13 @@ class PersonalEventsAdapter(private var events: List<PersonalEvent>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val event = events[position]
         holder.typeTextView.text = event.type.name
-        holder.parkingIdTextView.text = "Area ID: ${event.parkingAreaId}"
         
-        //TODO: Check date format
-        holder.startTimeTextView.text = "Start: ${event.startTime}"
-        holder.endTimeTextView.text = "End: ${event.endTime ?: "-"}"
+        // Use Area Name instead of ID
+        holder.parkingNameTextView.text = event.parkingAreaName ?: "Area ID: ${event.parkingAreaId}"
+        
+        // Basic ISO format string display
+        holder.startTimeTextView.text = "Inizio: ${event.startTime}"
+        holder.endTimeTextView.text = "Fine: ${event.endTime ?: "-"}"
     }
 
     override fun getItemCount() = events.size

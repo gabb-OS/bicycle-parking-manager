@@ -5,7 +5,6 @@
     <string name="nav_header_title">Bicycle Parking Manager</string>
     <string name="nav_header_subtitle">App BPM</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
 
     <!-- Menu -->
     <string name="menu_parking_event_trigger">Parcheggiami!</string>
@@ -23,6 +22,7 @@
     <string name="lasciaparcheggio">Lascia Parcheggio</string>
     <string name="location_permission_denied">Permessi per la localizzazione negati</string>
 
-    <!-- Login/Register -->
-    <string name="login_register">Login/Register</string>
+    <!-- Three dots menu -->
+    <string name="action_settings">Impostazioni</string>
+    <string name="login_register">Registrazione / Login</string>
 </resources>
