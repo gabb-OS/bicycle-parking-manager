@@ -70,7 +70,7 @@ class ParkingArea(db.Model):
 
     @staticmethod
     def get_all():
-        return ParkingArea.query.all()
+        return ParkingArea.query.order_by(ParkingArea.name.asc()).all()
 
     def to_dict(self):
         """Converts the object to a dictionary for JSON responses."""
