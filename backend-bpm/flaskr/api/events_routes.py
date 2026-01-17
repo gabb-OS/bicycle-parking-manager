@@ -51,8 +51,6 @@ def parking_event(token):
     location_point = WKTElement(f'POINT({longitude} {latitude})', srid=4326)
     parking_area = ParkingArea.get_by_locationpoint(location_point)
     
-    if parking_area is None:
-        return jsonify({"error": "Location is not within any parking area"}), 400
     
     # Check which Geoprivacy mode is required
     # If field does not exists, no privacy is applied
