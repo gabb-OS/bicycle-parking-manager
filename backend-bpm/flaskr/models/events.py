@@ -20,13 +20,13 @@ class ParkingEvent(db.Model):
     type = db.Column(db.Enum(EventType), nullable=False)
     location_point = db.Column(Geometry(geometry_type='POINT', srid=4326), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    parking_area_id = db.Column(db.Integer, db.ForeignKey('parking_areas.id'), nullable=False)
+    parking_area_id = db.Column(db.Integer, db.ForeignKey('parking_areas.id'), nullable=True)
 
     # Relationships
     user = db.relationship('User', backref=db.backref('parking_events', lazy='dynamic'))
     parking_area = db.relationship('ParkingArea', backref=db.backref('parking_events', lazy='dynamic'))
 
-    def __init__(self, type, location_point, user_id, parking_area_id, start_time=None, end_time=None):
+    def __init__(self, type, location_point, user_id, parking_area_id=None, start_time=None, end_time=None):
         self.type = type
         self.location_point = location_point
         self.user_id = user_id
