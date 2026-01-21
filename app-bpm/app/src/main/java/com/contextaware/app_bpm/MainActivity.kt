@@ -53,10 +53,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
         return when (item.itemId) {
             R.id.action_login -> {
-                val navController = findNavController(R.id.nav_host_fragment_content_main)
                 navController.navigate(R.id.nav_login)
+                true
+            }
+            R.id.action_privacy_settings -> {
+                navController.navigate(R.id.nav_privacy_settings)
                 true
             }
             else -> super.onOptionsItemSelected(item)

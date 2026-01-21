@@ -35,4 +35,15 @@
             app:popUpToInclusive="true" />
     </fragment>
 
+    <fragment
+        android:id="@+id/nav_privacy_settings"
+        android:name="com.contextaware.app_bpm.ui.privacy.PrivacySettingsFragment"
+        android:label="Impostazioni privacy"
+        tools:layout="@layout/fragment_privacy_settings" >
+        <action
+            android:id="@+id/action_login_to_home"
+            app:destination="@id/nav_home"
+            app:popUpTo="@id/nav_privacy_settings"
+            app:popUpToInclusive="true" />
+    </fragment>
 </navigation>

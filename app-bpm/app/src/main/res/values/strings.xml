@@ -1,4 +1,4 @@
-<resources>
+à <resources>
     <string name="app_name">app-bpm</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -25,4 +25,11 @@
     <!-- Three dots menu -->
     <string name="action_settings">Impostazioni</string>
     <string name="login_register">Registrazione / Login</string>
+    <string name="impostazioni_privacy">Impostazioni privacy</string>
+
+    <!-- Geoprivacy settings -->
+    <string name="spatial_cloaking">Spatial Cloaking</string>
+    <string name="privacy_technique_description">
+        Proteggi la tua posizione precisa. Se attiva, il sistema memorizzerà un punto generico dell\'area di parcheggio in cui avviene un evento invece delle tue coordinate esatte.
+    </string>
 </resources>
