@@ -1,12 +1,15 @@
 package com.contextaware.app_bpm.ui.parkme
 
+import android.app.Application
+import android.content.Context
 import android.location.Location
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.contextaware.app_bpm.data.model.ParkingEvent
 import com.contextaware.app_bpm.data.model.ParkingEventType
+import com.contextaware.app_bpm.data.model.ParkingResponse
 import com.contextaware.app_bpm.data.network.RetrofitClient
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
@@ -14,7 +17,7 @@ import org.json.JSONObject
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class ParkMeViewModel : ViewModel() {
+class ParkMeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _text = MutableLiveData<String>().apply {
         value = "Press the button to park"
@@ -68,12 +71,17 @@ class ParkMeViewModel : ViewModel() {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
         val timestamp = formatter.format(LocalDateTime.now())
 
+        // Get privacy setting from SharedPreferences
+        val sharedPref = getApplication<Application>().getSharedPreferences("privacy_prefs", Context.MODE_PRIVATE)
+        val isPrivacyEnabled = sharedPref.getBoolean("is_privacy_enabled", false)
+
         // Create Event
         val event = ParkingEvent(
             type = eventType,
             longitude = location.longitude,
             latitude = location.latitude,
-            timestamp = timestamp
+            timestamp = timestamp,
+            isPrivacyEnabled = isPrivacyEnabled
         )
 
         viewModelScope.launch {
