@@ -67,6 +67,12 @@ class ParkingArea(db.Model):
         return ParkingArea.query.filter(
             geo_func.ST_Contains(ParkingArea.location_area, location_point)
             ).first()
+    
+    @staticmethod
+    def get_centroid_by_area(parking_area):
+        """Returns a centroid-like point for a given area, ensuring that the resulting location lies within the area itself 
+        (unlike the standard centroid function, which does not guarantee this)."""
+        return geo_func.ST_PointOnSurface(parking_area.location_area)
 
     @staticmethod
     def get_all():

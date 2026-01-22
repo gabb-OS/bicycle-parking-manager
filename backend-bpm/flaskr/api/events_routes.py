@@ -40,7 +40,7 @@ def parking_event(token):
     except ValueError:
         return jsonify({"error": "Invalid event type. Must be 'park' or 'leave'"}), 400
     
-    # Expexts an ISO_LOCAL_DATE_TIME (ISO-8601) - e.g., "2026-01-05T15:48:45"
+    # Expects an ISO_LOCAL_DATE_TIME (ISO-8601) - e.g., "2026-01-05T15:48:45"
     try:
         current_timestamp = datetime.fromisoformat(data['timestamp'])
     except ValueError:
@@ -55,6 +55,11 @@ def parking_event(token):
     if parking_area is None:
         return jsonify({"error": "Location is not within any parking area"}), 400
     
+    # Check if Geoprivacy spatial cloaking setting is on
+    # If field does not exists, no privacy is applied
+    if data.get("is_privacy_enabled", False):
+        location_point = ParkingArea.get_centroid_by_area(parking_area)
+
     # Update parking area capacity based on event type
     if event_type == EventType.PARK:
         if not parking_area.park_bicycle():
