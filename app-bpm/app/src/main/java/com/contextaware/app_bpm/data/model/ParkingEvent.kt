@@ -7,6 +7,6 @@ data class ParkingEvent(
     val longitude: Double,
     val latitude: Double,
     val timestamp: String,
-    @SerializedName("is_privacy_enabled")
-    val isPrivacyEnabled: Boolean
+    @SerializedName("privacy_mode")
+    val privacyMode: GeoprivacyType
 )

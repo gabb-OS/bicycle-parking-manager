@@ -32,4 +32,6 @@
     <string name="privacy_technique_description">
         Proteggi la tua posizione precisa. Se attiva, il sistema memorizzerà un punto generico dell\'area di parcheggio in cui avviene un evento invece delle tue coordinate esatte.
     </string>
+    <string name="random_description">La posizione viene offuscata in un punto casuale all\'interno dell\'area di parcheggio.</string>
+    <string name="centroid_description">La posizione viene sempre salvata in una location predefinita (centroide dell\'area).</string>
 </resources>

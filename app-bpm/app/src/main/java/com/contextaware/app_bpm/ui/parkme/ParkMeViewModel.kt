@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.contextaware.app_bpm.data.model.GeoprivacyType
 import com.contextaware.app_bpm.data.model.ParkingEvent
 import com.contextaware.app_bpm.data.model.ParkingEventType
 import com.contextaware.app_bpm.data.model.ParkingResponse
@@ -71,9 +72,16 @@ class ParkMeViewModel(application: Application) : AndroidViewModel(application) 
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
         val timestamp = formatter.format(LocalDateTime.now())
 
-        // Get privacy setting from SharedPreferences
+        // Get privacy settings from SharedPreferences
         val sharedPref = getApplication<Application>().getSharedPreferences("privacy_prefs", Context.MODE_PRIVATE)
         val isPrivacyEnabled = sharedPref.getBoolean("is_privacy_enabled", false)
+        val savedPrivacyType = sharedPref.getString("geoprivacy_type", GeoprivacyType.RANDOM.name)
+
+        val geoprivacyType = if (isPrivacyEnabled) {
+            GeoprivacyType.valueOf(savedPrivacyType ?: GeoprivacyType.RANDOM.name)
+        } else {
+            GeoprivacyType.NONE
+        }
 
         // Create Event
         val event = ParkingEvent(
@@ -81,7 +89,7 @@ class ParkMeViewModel(application: Application) : AndroidViewModel(application) 
             longitude = location.longitude,
             latitude = location.latitude,
             timestamp = timestamp,
-            isPrivacyEnabled = isPrivacyEnabled
+            privacyMode = geoprivacyType
         )
 
         viewModelScope.launch {
