@@ -73,6 +73,16 @@ class ParkingArea(db.Model):
         """Returns a centroid-like point for a given area, ensuring that the resulting location lies within the area itself 
         (unlike the standard centroid function, which does not guarantee this)."""
         return geo_func.ST_PointOnSurface(parking_area.location_area)
+    
+    @staticmethod
+    def get_random_point_in_area(parking_area):
+        """Returns a single random point in a given area
+        To be noted that ST_GeneratePoints returns a MULTIPOINT type, the first point must be extracted """
+        random_point = geo_func.ST_GeometryN(
+            geo_func.ST_GeneratePoints(parking_area.location_area, 1),
+            1
+        );
+        return random_point
 
     @staticmethod
     def get_all():

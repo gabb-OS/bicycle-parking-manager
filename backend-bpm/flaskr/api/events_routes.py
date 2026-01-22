@@ -55,10 +55,13 @@ def parking_event(token):
     if parking_area is None:
         return jsonify({"error": "Location is not within any parking area"}), 400
     
-    # Check if Geoprivacy spatial cloaking setting is on
+    # Check which Geoprivacy mode is required
     # If field does not exists, no privacy is applied
-    if data.get("is_privacy_enabled", False):
+    privacy_mode =  data.get("privacy_mode", "none")
+    if privacy_mode == "centroid":
         location_point = ParkingArea.get_centroid_by_area(parking_area)
+    elif privacy_mode == "random":
+        location_point = ParkingArea.get_random_point_in_area(parking_area)
 
     # Update parking area capacity based on event type
     if event_type == EventType.PARK:
