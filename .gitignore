@@ -48,6 +48,7 @@ __screenshots__/
 reports/
 coverage-final.json
 lcov-report/
+**/privacy_plots
 
 # Package managers
 package-lock.json

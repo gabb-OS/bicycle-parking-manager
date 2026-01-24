@@ -9,3 +9,5 @@ flask-cors
 gunicorn
 shapely
 firebase-admin
+matplotlib
+scipy
