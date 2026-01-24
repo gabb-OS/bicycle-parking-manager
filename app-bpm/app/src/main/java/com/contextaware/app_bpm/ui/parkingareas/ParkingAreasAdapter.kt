@@ -28,8 +28,8 @@ class ParkingAreasAdapter(private var parkingAreas: List<ParkingArea>) :
         val area = parkingAreas[position]
         holder.nameTextView.text = area.name
         holder.remainingCapacityTextView.text = area.residualCapacity.toString()
-        holder.totalCapacityTextView.text = "Total: ${area.maxCapacity}"
-        holder.occupancyTextView.text = String.format("Occupancy: %.1f%%", area.occupancyPercentage)
+        holder.totalCapacityTextView.text = "Totale: ${area.maxCapacity}"
+        holder.occupancyTextView.text = String.format("Occupato: %.1f%%", area.occupancyPercentage)
     }
 
     override fun getItemCount() = parkingAreas.size

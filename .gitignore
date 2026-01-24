@@ -9,6 +9,7 @@
 *.secret
 *.bak
 *.tmp
+keys/
 
 # Logs
 *.log
@@ -47,6 +48,7 @@ __screenshots__/
 reports/
 coverage-final.json
 lcov-report/
+**/privacy_plots
 
 # Package managers
 package-lock.json
@@ -127,3 +129,8 @@ frontend-bpm/*.tsbuildinfo
 **/*.jar
 **/*.war
 **/*.ear
+
+############################
+# APP ANDROID
+############################
+**/google-services.json

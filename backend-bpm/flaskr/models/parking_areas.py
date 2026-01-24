@@ -67,10 +67,26 @@ class ParkingArea(db.Model):
         return ParkingArea.query.filter(
             geo_func.ST_Contains(ParkingArea.location_area, location_point)
             ).first()
+    
+    @staticmethod
+    def get_centroid_by_area(parking_area):
+        """Returns a centroid-like point for a given area, ensuring that the resulting location lies within the area itself 
+        (unlike the standard centroid function, which does not guarantee this)."""
+        return geo_func.ST_PointOnSurface(parking_area.location_area)
+    
+    @staticmethod
+    def get_random_point_in_area(parking_area):
+        """Returns a single random point in a given area
+        To be noted that ST_GeneratePoints returns a MULTIPOINT type, the first point must be extracted """
+        random_point = geo_func.ST_GeometryN(
+            geo_func.ST_GeneratePoints(parking_area.location_area, 1),
+            1
+        );
+        return random_point
 
     @staticmethod
     def get_all():
-        return ParkingArea.query.all()
+        return ParkingArea.query.order_by(ParkingArea.name.asc()).all()
 
     def to_dict(self):
         """Converts the object to a dictionary for JSON responses."""

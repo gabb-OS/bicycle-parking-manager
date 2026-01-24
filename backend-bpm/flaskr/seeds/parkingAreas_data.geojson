@@ -361,7 +361,7 @@
       "type": "Feature",
       "properties": {
         "id": 11,
-        "name": "Via Genova - Capolinea 27B",
+        "name": "Genova - Capolinea 27B",
         "max_capacity": 5,
         "residual_capacity": 5
       },

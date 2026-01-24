@@ -4,6 +4,8 @@ from geoalchemy2 import WKTElement
 from flaskr.extensions import db
 from flaskr.models.events import ParkingEvent, EventType
 from flaskr.models.parking_areas import ParkingArea
+from flaskr.models.users import User
+from flaskr.guards.firebase_guard import firebase_guard
 
 events_bp = Blueprint('events', __name__, url_prefix='/events')
 
@@ -18,11 +20,16 @@ events_bp = Blueprint('events', __name__, url_prefix='/events')
 #  - type ("park" or "leave")
 #  - timestamp
 @events_bp.route("/parking", methods=["POST"])
-def parking_event():
+@firebase_guard
+def parking_event(token):
     data = request.get_json()
+
+    # Get correct user     
+    email = token.get('email')
+    user = User.get_by_email(email)
     
     # Validate required fields
-    required_fields = ['user_id', 'longitude', 'latitude', 'type', 'timestamp']
+    required_fields = ['longitude', 'latitude', 'type', 'timestamp']
     for field in required_fields:
         if field not in data:
             return jsonify({"error": f"Missing required field: {field}"}), 400
@@ -33,7 +40,7 @@ def parking_event():
     except ValueError:
         return jsonify({"error": "Invalid event type. Must be 'park' or 'leave'"}), 400
     
-    # Expexts an ISO_LOCAL_DATE_TIME (ISO-8601) - e.g., "2026-01-05T15:48:45"
+    # Expects an ISO_LOCAL_DATE_TIME (ISO-8601) - e.g., "2026-01-05T15:48:45"
     try:
         current_timestamp = datetime.fromisoformat(data['timestamp'])
     except ValueError:
@@ -48,6 +55,14 @@ def parking_event():
     if parking_area is None:
         return jsonify({"error": "Location is not within any parking area"}), 400
     
+    # Check which Geoprivacy mode is required
+    # If field does not exists, no privacy is applied
+    privacy_mode =  data.get("privacy_mode", "none")
+    if privacy_mode == "centroid":
+        location_point = ParkingArea.get_centroid_by_area(parking_area)
+    elif privacy_mode == "random":
+        location_point = ParkingArea.get_random_point_in_area(parking_area)
+
     # Update parking area capacity based on event type
     if event_type == EventType.PARK:
         if not parking_area.park_bicycle():
@@ -56,7 +71,7 @@ def parking_event():
         event = ParkingEvent(
             type=event_type,
             location_point=location_point,
-            user_id=data['user_id'],
+            user_id=user.id,
             parking_area_id=parking_area.id,
             start_time=current_timestamp
         )
@@ -65,7 +80,7 @@ def parking_event():
     else:  # LEAVE        
         # Find active PARK event for this user/area with a prior start_time
         existing_event = ParkingEvent.get_active_park_event(
-            data['user_id'], 
+            user.id, 
             parking_area.id, 
             current_timestamp
         )
@@ -110,11 +125,25 @@ def get_event_by_id(event_id):
 
 
 # Get all user 'parking events' (from the App)
-@events_bp.route("/user/<int:user_id>", methods=["GET"])
-def get_user_parking_events(user_id):
-    events = ParkingEvent.get_by_user(user_id)
-    return jsonify([event.to_dict() for event in events])
-
+@events_bp.route("/user/personalevents", methods=["GET"])
+@firebase_guard
+def get_user_parking_events(token):
+    email = token.get('email')
+    user = User.get_by_email(email)
+    # Left join that returns user personal events also with relative parking area
+    results = db.session.query(ParkingEvent, ParkingArea.name) \
+        .outerjoin(ParkingArea, ParkingEvent.parking_area_id == ParkingArea.id) \
+        .filter(ParkingEvent.user_id == user.id) \
+        .all()
+    
+    # We want to return parking area name per each returned record
+    events_with_names = []
+    for event, area_name in results:
+        event.parking_area_name = area_name if area_name else "Area non specificata"
+        events_with_names.append(event.to_dict_with_parkingname())
+    
+    return jsonify(events_with_names)
+   
 
 # Get all events for a specific parking area
 @events_bp.route("/area/<int:area_id>", methods=["GET"])

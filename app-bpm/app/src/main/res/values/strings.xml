@@ -1,11 +1,10 @@
-<resources>
+à <resources>
     <string name="app_name">app-bpm</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Bicycle Parking Manager</string>
     <string name="nav_header_subtitle">App BPM</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
 
     <!-- Menu -->
     <string name="menu_parking_event_trigger">Parcheggiami!</string>
@@ -22,4 +21,17 @@
     <string name="parcheggia">Parcheggia</string>
     <string name="lasciaparcheggio">Lascia Parcheggio</string>
     <string name="location_permission_denied">Permessi per la localizzazione negati</string>
+
+    <!-- Three dots menu -->
+    <string name="action_settings">Impostazioni</string>
+    <string name="login_register">Registrazione / Login</string>
+    <string name="impostazioni_privacy">Impostazioni privacy</string>
+
+    <!-- Geoprivacy settings -->
+    <string name="spatial_cloaking">Spatial Cloaking</string>
+    <string name="privacy_technique_description">
+        Proteggi la tua posizione precisa. Se attiva, il sistema memorizzerà un punto generico dell\'area di parcheggio in cui avviene un evento invece delle tue coordinate esatte.
+    </string>
+    <string name="random_description">La posizione viene offuscata in un punto casuale all\'interno dell\'area di parcheggio.</string>
+    <string name="centroid_description">La posizione viene sempre salvata in una location predefinita (centroide dell\'area).</string>
 </resources>

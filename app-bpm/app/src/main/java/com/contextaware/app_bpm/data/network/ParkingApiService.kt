@@ -7,16 +7,19 @@ import com.contextaware.app_bpm.data.model.PersonalEvent
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
-import retrofit2.http.Path
 
 interface ParkingApiService {
     @GET("areas/")
     suspend fun getParkingAreas(): Response<List<ParkingArea>>
 
-    @GET("events/user/{user_id}")
-    suspend fun getUserEvents(@Path("user_id") userId: Int): Response<List<PersonalEvent>>
+    @GET("events/user/personalevents")
+    suspend fun getUserEvents(@Header("Authorization") authHeader: String): Response<List<PersonalEvent>>
 
     @POST("events/parking")
-    suspend fun sendParkingEvent(@Body event: ParkingEvent): Response<ParkingResponse>
+    suspend fun sendParkingEvent(
+        @Header("Authorization") authHeader: String,
+        @Body event: ParkingEvent
+    ): Response<ParkingResponse>
 }
