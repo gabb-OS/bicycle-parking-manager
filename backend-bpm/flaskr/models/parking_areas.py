@@ -83,6 +83,15 @@ class ParkingArea(db.Model):
             1
         );
         return random_point
+    
+    @staticmethod
+    def apply_fallback_privacy(location_point):
+        """
+        Applica una logica di privacy per i parcheggi fuori area.
+        TODO: Implementare logica futura (es. offuscamento, troncatura coordinate, etc.)
+        """
+        # Per ora restituisce il punto esatto, in futuro modificalo qui
+        return location_point
 
     @staticmethod
     def get_all():
