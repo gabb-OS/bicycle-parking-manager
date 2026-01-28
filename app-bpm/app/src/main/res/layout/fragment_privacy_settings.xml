@@ -75,6 +75,7 @@
             android:checked="true" />
 
         <TextView
+            android:id="@+id/tv_random_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
@@ -92,6 +93,52 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:text="@string/centroid_description" />
+
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/tv_randomization_level_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Livello di Offuscamento Random:"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/radio_group_privacy_type" />
+
+    <RadioGroup
+        android:id="@+id/radio_group_randomization_level"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_randomization_level_label">
+
+        <RadioButton
+            android:id="@+id/radio_random_high"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Alto"
+            android:checked="true" />
+
+        <RadioButton
+            android:id="@+id/radio_random_low"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Basso" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:text="Quando si parcheggia all'esterno di un'area definita, indica il livello di perturbazione della posizione memorizzata dal sistema."
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray" />
 
     </RadioGroup>
 

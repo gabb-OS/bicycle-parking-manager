@@ -9,8 +9,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.contextaware.app_bpm.data.model.GeoprivacyType
 import com.contextaware.app_bpm.data.model.LeaveResponse
-import com.contextaware.app_bpm.data.model.ParkingEvent
 import com.contextaware.app_bpm.data.model.ParkResponse
+import com.contextaware.app_bpm.data.model.ParkingEvent
+import com.contextaware.app_bpm.data.model.ParkingEventType
+import com.contextaware.app_bpm.data.model.RandomizationLevel
 import com.contextaware.app_bpm.data.network.RetrofitClient
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
@@ -75,11 +77,18 @@ class ParkMeViewModel(application: Application) : AndroidViewModel(application) 
         val sharedPref = getApplication<Application>().getSharedPreferences("privacy_prefs", Context.MODE_PRIVATE)
         val isPrivacyEnabled = sharedPref.getBoolean("is_privacy_enabled", false)
         val savedPrivacyType = sharedPref.getString("geoprivacy_type", GeoprivacyType.RANDOM.name)
+        val savedRandomizationLevel = sharedPref.getString("randomization_level", RandomizationLevel.HIGH.name)
 
-        val privacyMode = if (isPrivacyEnabled) {
+        val geoprivacyType = if (isPrivacyEnabled) {
             GeoprivacyType.valueOf(savedPrivacyType ?: GeoprivacyType.RANDOM.name)
         } else {
             GeoprivacyType.NONE
+        }
+
+        val randomizationLevel = if (geoprivacyType == GeoprivacyType.RANDOM) {
+            RandomizationLevel.valueOf(savedRandomizationLevel ?: RandomizationLevel.HIGH.name)
+        } else {
+            RandomizationLevel.NONE // If not RANDOM, level is NONE
         }
 
         // Create Request Body
@@ -87,7 +96,8 @@ class ParkMeViewModel(application: Application) : AndroidViewModel(application) 
             longitude = location.longitude,
             latitude = location.latitude,
             timestamp = timestamp,
-            privacyMode = privacyMode
+            privacyMode = geoprivacyType,
+            randomizationLevel = randomizationLevel
         )
 
         viewModelScope.launch {
