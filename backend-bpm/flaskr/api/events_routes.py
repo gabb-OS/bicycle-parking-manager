@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import Blueprint, jsonify, request
-from geoalchemy2 import WKTElement
+from geoalchemy2 import WKTElement, functions as geo_func
 from flaskr.extensions import db
 from flaskr.models.events import ParkingEvent, EventType
 from flaskr.models.parking_areas import ParkingArea
@@ -151,8 +151,9 @@ def start_parking(token):
             return jsonify({"error": "Parking area is full"}), 400
             
     else:
-        if privacy_mode == "eee":
-            location_point = ParkingArea.apply_fallback_privacy(location_point)
+        if privacy_mode == "random":
+            randomization_level = data.get("randomization_level", "none")
+            location_point = ParkingArea.get_random_point_in_circle(location_point, randomization_level)
 
     event = ParkingEvent(
         type=EventType.PARK,
@@ -196,20 +197,30 @@ def leave_parking(token):
     
     target_area_id = parking_area.id if parking_area else None
     
-    # Looking for active park event
+    # Looking for latest active park event for user.id user AND that is at least MAX_DISTANCE_METERS close to actual user location
     existing_event = ParkingEvent.get_active_park_event(
         user.id, 
-        target_area_id, 
         current_timestamp
     )
 
     if existing_event is None:
-        loc_type = "regulated area" if target_area_id else "free parking zone"
-        return jsonify({"error": f"No active parking session found for this user in this {loc_type}"}), 404
+        return jsonify({"error": f"No active parking session found for this user"}), 404
+
+    # MAX_DISTANCE_METERS must be larger than the Cloacking Random Privacy setting HIGH/LOW for tolerate privacy distance offset
+    # Right now HIGH = 100 meters, LOW = 50 meters
+    MAX_DISTANCE_METERS = 300
+    distance_meters = db.session.scalar(
+        geo_func.ST_DistanceSphere(existing_event.location_point, location_point)
+    )
+    if distance_meters > MAX_DISTANCE_METERS:
+        return jsonify({
+            "error": f"You are too far from the parking spot ({int(distance_meters)}m). You must be within {MAX_DISTANCE_METERS}m to leave."
+        }), 400
+
     
     if parking_area:
         if not parking_area.leave_parking():
-            return jsonify({"error": "Parking area capacity error (already empty?)"}), 400
+            return jsonify({"error": "Parking area capacity error (already empty)"}), 400
     
     # Closing park event
     existing_event.type = EventType.LEAVE

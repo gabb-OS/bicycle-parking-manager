@@ -1,7 +1,8 @@
 from flaskr.extensions import db
-from geoalchemy2 import Geometry
+from geoalchemy2 import Geometry, Geography
 from geoalchemy2 import functions as geo_func
 from geoalchemy2.shape import to_shape
+from sqlalchemy import cast
 import json
 
 
@@ -85,13 +86,23 @@ class ParkingArea(db.Model):
         return random_point
     
     @staticmethod
-    def apply_fallback_privacy(location_point):
-        """
-        Applica una logica di privacy per i parcheggi fuori area.
-        TODO: Implementare logica futura (es. offuscamento, troncatura coordinate, etc.)
-        """
-        # Per ora restituisce il punto esatto, in futuro modificalo qui
-        return location_point
+    def get_random_point_in_circle(location_point, randomization_level):
+        radius_in_meters = 100 if randomization_level == 'high' else 50
+
+        # Generate a circumference of radius_in_meters meters that has location_point as center
+        area_buffer_geography = geo_func.ST_Buffer(
+            cast(location_point, Geography(srid=4326)), 
+            radius_in_meters
+        )
+
+        # Take uno random point inside that generated circumference
+        area_buffer_geometry = cast(area_buffer_geography, Geometry(srid=4326))
+        random_point = geo_func.ST_GeometryN(
+            geo_func.ST_GeneratePoints(area_buffer_geometry, 1),
+            1
+        );
+        
+        return random_point
 
     @staticmethod
     def get_all():

@@ -66,11 +66,11 @@ class ParkingEvent(db.Model):
         return ParkingEvent.query.order_by(ParkingEvent.start_time.desc()).limit(limit).all()
     
     @staticmethod
-    def get_active_park_event(user_id, parking_area_id, current_timestamp):
-        """Finds the most recent active Parking event relative to a specified user in a specified parking area"""
+    def get_active_park_event(user_id, current_timestamp):
+        """Finds the most recent active Parking event relative to a specified user"""
         return ParkingEvent.query.filter(
             ParkingEvent.user_id == user_id,
-            ParkingEvent.parking_area_id == parking_area_id,
+            #ParkingEvent.parking_area_id == parking_area_id,
             ParkingEvent.type == EventType.PARK,
             ParkingEvent.start_time <= current_timestamp,
             ParkingEvent.end_time == None
