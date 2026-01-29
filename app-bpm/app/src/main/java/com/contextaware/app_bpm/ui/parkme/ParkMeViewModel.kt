@@ -8,15 +8,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.contextaware.app_bpm.data.model.GeoprivacyType
+import com.contextaware.app_bpm.data.model.LeaveResponse
+import com.contextaware.app_bpm.data.model.ParkResponse
 import com.contextaware.app_bpm.data.model.ParkingEvent
 import com.contextaware.app_bpm.data.model.ParkingEventType
-import com.contextaware.app_bpm.data.model.ParkingResponse
+import com.contextaware.app_bpm.data.model.RandomizationLevel
 import com.contextaware.app_bpm.data.network.RetrofitClient
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import retrofit2.Response
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.math.ceil
 
 class ParkMeViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -38,8 +42,6 @@ class ParkMeViewModel(application: Application) : AndroidViewModel(application) 
 
     fun handleAutoEvent(isParkAction: Boolean, location: Location) {
         val currentIsParking = _isParking.value ?: true
-        // If current state is ready to PARK (true) and auto-event is Park (true) -> OK
-        // If current state is ready to LEAVE (false) and auto-event is Leave (false) -> OK
         if (currentIsParking == isParkAction) {
              sendParkingEvent(location)
         }
@@ -66,9 +68,8 @@ class ParkMeViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun performParkingRequest(authHeader: String, location: Location) {
         val currentIsParking = _isParking.value ?: true
-        val eventType = if (currentIsParking) ParkingEventType.PARK else ParkingEventType.LEAVE
 
-        // Formatter: 2023-10-27T10:00:00.12
+        // Formatter: 2023-10-27T10:00:00
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
         val timestamp = formatter.format(LocalDateTime.now())
 
@@ -76,6 +77,7 @@ class ParkMeViewModel(application: Application) : AndroidViewModel(application) 
         val sharedPref = getApplication<Application>().getSharedPreferences("privacy_prefs", Context.MODE_PRIVATE)
         val isPrivacyEnabled = sharedPref.getBoolean("is_privacy_enabled", false)
         val savedPrivacyType = sharedPref.getString("geoprivacy_type", GeoprivacyType.RANDOM.name)
+        val savedRandomizationLevel = sharedPref.getString("randomization_level", RandomizationLevel.HIGH.name)
 
         val geoprivacyType = if (isPrivacyEnabled) {
             GeoprivacyType.valueOf(savedPrivacyType ?: GeoprivacyType.RANDOM.name)
@@ -83,24 +85,46 @@ class ParkMeViewModel(application: Application) : AndroidViewModel(application) 
             GeoprivacyType.NONE
         }
 
-        // Create Event
-        val event = ParkingEvent(
-            type = eventType,
+        val randomizationLevel = if (geoprivacyType == GeoprivacyType.RANDOM) {
+            RandomizationLevel.valueOf(savedRandomizationLevel ?: RandomizationLevel.HIGH.name)
+        } else {
+            RandomizationLevel.NONE // If not RANDOM, level is NONE
+        }
+
+        // Create Request Body
+        val requestBody = ParkingEvent(
             longitude = location.longitude,
             latitude = location.latitude,
             timestamp = timestamp,
-            privacyMode = geoprivacyType
+            privacyMode = geoprivacyType,
+            randomizationLevel = randomizationLevel
         )
 
         viewModelScope.launch {
             try {
-                val response = RetrofitClient.parkingApi.sendParkingEvent(authHeader, event)
+                val response: Response<*> = if (currentIsParking) {
+                    RetrofitClient.parkingApi.parkBicycle(authHeader, requestBody)
+                } else {
+                    RetrofitClient.parkingApi.leaveBicycle(authHeader, requestBody)
+                }
+
                 if (response.isSuccessful) {
-                    val body = response.body()
-                    if (body != null) {
-                        _statusMessage.value = "${body.message} in ${body.parkingArea}"
-                    } else {
-                        _statusMessage.value = "Event recorded successfully"
+                    val msg: String
+                    val area: String
+
+                    if (currentIsParking) { // Was trying to PARK, got ParkResponse
+                        val parkResponse = response.body() as? ParkResponse
+                        msg = parkResponse?.message ?: "Parcheggio avviato"
+                        area = parkResponse?.parkingArea ?: "Free Parking"
+                        _statusMessage.value = "$msg in $area (ID Evento: ${parkResponse?.eventId})"
+                    } else { // Was trying to LEAVE, got LeaveResponse
+                        val leaveResponse = response.body() as? LeaveResponse
+                        msg = leaveResponse?.message ?: "Parcheggio terminato"
+                        area = leaveResponse?.parkingArea ?: "Free Parking"
+                        val duration = leaveResponse?.durationMinutes?.let {
+                            " (Duration: ${ceil(it).toInt()} min)"
+                        } ?: ""
+                        _statusMessage.value = "$msg in $area$duration"
                     }
                     toggleParkingStatus()
                 } else {
@@ -108,17 +132,17 @@ class ParkMeViewModel(application: Application) : AndroidViewModel(application) 
                     val errorMsg = if (errorBody != null) {
                         try {
                             val jsonObject = JSONObject(errorBody)
-                            jsonObject.optString("error", "Error sending event")
+                            jsonObject.optString("error", "Errore durante l'operazione")
                         } catch (e: Exception) {
-                            "Error parsing response"
+                            "Errore nel parsing della risposta di errore"
                         }
                     } else {
-                        "Error: ${response.code()}"
+                        "Errore: ${response.code()}"
                     }
                     _statusMessage.value = errorMsg
                 }
             } catch (e: Exception) {
-                _statusMessage.value = "Connection Error: ${e.message}"
+                _statusMessage.value = "Errore di Connessione: ${e.message}"
             }
         }
     }

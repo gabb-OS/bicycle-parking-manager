@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.contextaware.app_bpm.R
 import com.contextaware.app_bpm.data.model.GeoprivacyType
+import com.contextaware.app_bpm.data.model.RandomizationLevel
 import com.contextaware.app_bpm.databinding.FragmentPrivacySettingsBinding
 
 class PrivacySettingsFragment : Fragment() {
@@ -38,10 +39,23 @@ class PrivacySettingsFragment : Fragment() {
                 else -> { /* NONE is handled by main switch being off */ }
             }
 
-            // Enable/disable RadioGroup based on main switch
+            // Load randomization level (default to HIGH if not found)
+            val savedRandomizationLevel = sharedPref.getString("randomization_level", RandomizationLevel.HIGH.name)
+            when (RandomizationLevel.valueOf(savedRandomizationLevel ?: RandomizationLevel.HIGH.name)) {
+                RandomizationLevel.HIGH -> binding.radioRandomHigh.isChecked = true
+                RandomizationLevel.LOW -> binding.radioRandomLow.isChecked = true
+                else -> { /* NONE is not directly selectable in radio group */ }
+            }
+
+            // Initial state: Enable/disable RadioGroups based on main switch and type
             binding.radioGroupPrivacyType.isEnabled = isPrivacyEnabled
             binding.radioRandom.isEnabled = isPrivacyEnabled
             binding.radioFixedPoint.isEnabled = isPrivacyEnabled
+
+            val isRandomSelected = binding.radioRandom.isChecked
+            binding.radioGroupRandomizationLevel.isEnabled = isPrivacyEnabled && isRandomSelected
+            binding.radioRandomHigh.isEnabled = isPrivacyEnabled && isRandomSelected
+            binding.radioRandomLow.isEnabled = isPrivacyEnabled && isRandomSelected
 
             // Handle main privacy switch change
             binding.switchPrivacy.setOnCheckedChangeListener { _, isChecked ->
@@ -52,11 +66,17 @@ class PrivacySettingsFragment : Fragment() {
                 binding.radioGroupPrivacyType.isEnabled = isChecked
                 binding.radioRandom.isEnabled = isChecked
                 binding.radioFixedPoint.isEnabled = isChecked
+
+                // Update randomization level group based on main switch AND random radio button
+                binding.radioGroupRandomizationLevel.isEnabled = isChecked && binding.radioRandom.isChecked
+                binding.radioRandomHigh.isEnabled = isChecked && binding.radioRandom.isChecked
+                binding.radioRandomLow.isEnabled = isChecked && binding.radioRandom.isChecked
+
                 val msg = if (isChecked) "Offuscamento Geoprivacy Attivato" else "Offuscamento Geoprivacy Disattivato"
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
             }
 
-            // Handle RadioGroup change
+            // Handle privacy type RadioGroup change
             binding.radioGroupPrivacyType.setOnCheckedChangeListener { group: RadioGroup, checkedId: Int ->
                 val selectedType = when (checkedId) {
                     R.id.radio_random -> GeoprivacyType.RANDOM
@@ -67,7 +87,29 @@ class PrivacySettingsFragment : Fragment() {
                     putString("geoprivacy_type", selectedType.name)
                     apply()
                 }
+
+                // Enable/disable randomization level group based on selected type
+                val isRandomSelected = (selectedType == GeoprivacyType.RANDOM)
+                val isPrivacyActive = binding.switchPrivacy.isChecked
+                binding.radioGroupRandomizationLevel.isEnabled = isPrivacyActive && isRandomSelected
+                binding.radioRandomHigh.isEnabled = isPrivacyActive && isRandomSelected
+                binding.radioRandomLow.isEnabled = isPrivacyActive && isRandomSelected
+
                 Toast.makeText(context, "Metodo privacy: ${selectedType.name}", Toast.LENGTH_SHORT).show()
+            }
+
+            // Handle randomization level RadioGroup change
+            binding.radioGroupRandomizationLevel.setOnCheckedChangeListener { group: RadioGroup, checkedId: Int ->
+                val selectedLevel = when (checkedId) {
+                    R.id.radio_random_high -> RandomizationLevel.HIGH
+                    R.id.radio_random_low -> RandomizationLevel.LOW
+                    else -> RandomizationLevel.HIGH // Default
+                }
+                with(sharedPref.edit()) {
+                    putString("randomization_level", selectedLevel.name)
+                    apply()
+                }
+                Toast.makeText(context, "Livello offuscamento: ${selectedLevel.name}", Toast.LENGTH_SHORT).show()
             }
 
         } catch (e: Exception) {
