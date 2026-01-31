@@ -1,3 +1,15 @@
 .demo-chart {
-  height: 35rem;
+  height: 25rem;
+}
+
+@media (max-width: 991.98px) {
+  .demo-chart {
+    height: 18rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .demo-chart {
+    height: 15rem;
+  }
 }
