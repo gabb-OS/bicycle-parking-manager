@@ -54,6 +54,18 @@ services:
     networks:
       - bpm-network
     # No ports exposed! DB is isolated.
+  
+  # --- 5. Cron Job for Daily Clustering at Midnight ---
+  clustering-cron:
+    image: alpine
+    depends_on:
+      - backend
+    command: >
+      sh -c "apk add --no-cache curl && 
+             echo '0 0 * * * curl -sf -X POST http://backend:4000/areas/cluster/run >> /proc/1/fd/1 2>&1' > /etc/crontabs/root && 
+             crond -f -l 2"
+    networks:
+      - bpm-network
 
 volumes:
   pgdata:
