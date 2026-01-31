@@ -11,3 +11,4 @@ shapely
 firebase-admin
 matplotlib
 scipy
+scikit-learn

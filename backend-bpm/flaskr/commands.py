@@ -10,6 +10,7 @@ from flaskr.models.events import ParkingEvent, EventType
 from datetime import datetime
 from shapely.geometry import shape  # Required to parse GeoJSON geometry
 from geoalchemy2.elements import WKTElement
+from flaskr.services.clustering_service import ClusteringService
 
 @click.command("seed-db")
 @with_appcontext
@@ -231,3 +232,14 @@ def seed_parking_events():
     except Exception as e:
         db.session.rollback()
         print(f"❌ Database error (Events): {e}")
+
+@click.command("run-clustering")
+@with_appcontext
+def run_clustering_command():
+    """Runs the spatial clustering algorithm on orphan parking events."""
+    print("🔄 Starting Auto-Clustering...")
+    try:
+        result = ClusteringService.perform_clustering()
+        print(f"✅ Result: {result}")
+    except Exception as e:
+        print(f"❌ Error during clustering: {e}")
