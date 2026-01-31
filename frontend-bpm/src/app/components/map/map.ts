@@ -1,4 +1,4 @@
-import { Component, effect, input, OnDestroy, OnInit } from '@angular/core';
+import { Component, effect, input, OnDestroy, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import TileLayer from 'ol/layer/Tile';
@@ -11,6 +11,7 @@ import Cluster from 'ol/source/Cluster';
 import GeoJSON from 'ol/format/GeoJSON';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
+import Overlay from 'ol/Overlay';
 import { getCenter } from 'ol/extent';
 import Style from 'ol/style/Style';
 import Icon from 'ol/style/Icon';
@@ -54,7 +55,17 @@ import { MapUtils } from '@core/utils/map.utils';
   styleUrl: './map.css',
   standalone: true,
 })
-export class MapComponent implements OnInit, OnDestroy {
+export class MapComponent implements OnInit, OnDestroy, AfterViewInit {
+  /**
+   * Reference to the tooltip element for hover information.
+   */
+  @ViewChild('tooltip') tooltipElement!: ElementRef<HTMLDivElement>;
+
+  /**
+   * OpenLayers Overlay for displaying tooltip on hover.
+   */
+  private tooltipOverlay!: Overlay;
+
   /**
    * Input signal for parking areas GeoJSON data.
    * Receives data from parent component.
@@ -403,6 +414,69 @@ export class MapComponent implements OnInit, OnDestroy {
       target: 'map',
       view: this.view,
       layers: [this.osmLayer, this.parkingAreasLayer, this.parkingEventsLayer, this.heatmapLayer, this.clusterLayer]
+    });
+  }
+
+  /**
+   * After view initialization - set up the tooltip overlay and pointer events.
+   */
+  ngAfterViewInit() {
+    // Create the overlay for the tooltip
+    this.tooltipOverlay = new Overlay({
+      element: this.tooltipElement.nativeElement,
+      positioning: 'bottom-center',
+      offset: [0, -10],
+      stopEvent: false
+    });
+    this.map?.addOverlay(this.tooltipOverlay);
+
+    // Add pointer move event listener for hover detection
+    this.map?.on('pointermove', (event) => {
+      const pixel = event.pixel;
+      const feature = this.map?.forEachFeatureAtPixel(pixel, (feat, layer) => {
+        // Only return features from the parking areas layer
+        if (layer === this.parkingAreasLayer) {
+          return feat;
+        }
+        return undefined;
+      });
+
+      if (feature) {
+        const properties = feature.getProperties();
+        const geometryType = feature.getGeometry()?.getType();
+
+        // Only show tooltip for polygon features (parking areas)
+        if (geometryType === 'Polygon') {
+          const name = properties['name'] || 'Area senza nome';
+          const residualCapacity = properties['residual_capacity'] ?? 0;
+          const maxCapacity = properties['max_capacity'] ?? 0;
+          const occupancy = maxCapacity > 0
+            ? Math.round(((maxCapacity - residualCapacity) / maxCapacity) * 100)
+            : 0;
+
+          // Update tooltip content
+          this.tooltipElement.nativeElement.innerHTML = `
+            <strong>${name}</strong><br>
+            <span class="tooltip-label">Occupazione:</span> ${occupancy}%<br>
+            <span class="tooltip-label">Posti liberi:</span> ${residualCapacity}/${maxCapacity}
+          `;
+
+          // Position and show the tooltip
+          this.tooltipOverlay.setPosition(event.coordinate);
+          this.tooltipElement.nativeElement.style.display = 'block';
+
+          // Change cursor to pointer
+          if (this.map) {
+            this.map.getTargetElement().style.cursor = 'pointer';
+          }
+        }
+      } else {
+        // Hide tooltip when not over a feature
+        this.tooltipElement.nativeElement.style.display = 'none';
+        if (this.map) {
+          this.map.getTargetElement().style.cursor = '';
+        }
+      }
     });
   }
 

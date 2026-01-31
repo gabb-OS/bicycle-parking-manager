@@ -1,8 +1,40 @@
 .map {
-    width: 60vw;
+    width: 100%;
     height: 80vh;
     position: relative;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     overflow: hidden;
+}
+
+@media (max-width: 991.98px) {
+    .map {
+        height: 60vh;
+    }
+}
+
+/* Tooltip styles */
+.map-tooltip {
+    display: none;
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+    z-index: 100;
+    max-width: 220px;
+    white-space: nowrap;
+}
+
+.map-tooltip strong {
+    color: #333;
+    font-size: 14px;
+}
+
+.map-tooltip .tooltip-label {
+    color: #666;
 }

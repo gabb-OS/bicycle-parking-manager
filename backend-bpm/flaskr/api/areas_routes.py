@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy import func
 from flaskr.extensions import db
 from flaskr.models.parking_areas import ParkingArea
+from flaskr.services.clustering_service import ClusteringService
 
 areas_bp = Blueprint('areas', __name__, url_prefix='/areas')
 
@@ -124,3 +125,12 @@ def get_capacity_summary():
         "total_occupied": total_max - total_residual,
         "overall_occupancy_percentage": ((total_max - total_residual) / total_max * 100) if total_max > 0 else 0
     })
+
+@areas_bp.route("/cluster/run", methods=["POST"])
+def trigger_clustering():
+    """Manually triggers the parking area clustering algorithm."""
+    try:
+        result = ClusteringService.perform_clustering()
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

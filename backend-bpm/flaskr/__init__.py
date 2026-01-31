@@ -5,7 +5,7 @@ from flask_cors import CORS
 from flaskr.api.users_routes import users_bp
 from flaskr.api.areas_routes import areas_bp
 from flaskr.api.events_routes import events_bp
-from flaskr.commands import seed_db_command
+from flaskr.commands import seed_db_command, run_clustering_command
 from flaskr.models import parking_areas as areas_model, users as users_model, events as events_model
 from flaskr.privacy_stats.privacy_scripts.privacy_perturbation import calculate_privacy_perturbation, generate_privacy_plots
 import firebase_admin
@@ -31,6 +31,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 migrate.init_app(app, db)
 app.cli.add_command(seed_db_command)
+app.cli.add_command(run_clustering_command)
 
 # Firebase initialization with private key
 cred = credentials.Certificate("flaskr/keys/firebase-private-key.json")

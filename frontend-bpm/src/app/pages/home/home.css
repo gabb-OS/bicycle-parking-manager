@@ -1,0 +1,87 @@
+.home-container {
+    position: relative;
+}
+
+/* Sidebar Column (Desktop) */
+.sidebar-column {
+    height: 100%;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    border-left: 1px solid #dee2e6;
+}
+
+.sidebar-content {
+    padding: 1rem;
+}
+
+.sidebar-section {
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-section:last-child {
+    margin-bottom: 0;
+}
+
+/* Toggle Button for Mobile */
+.sidebar-toggle {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 1020;
+    border-radius: 50px;
+    padding: 0.75rem 1.25rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.sidebar-toggle i {
+    font-size: 1.1rem;
+}
+
+/* Offcanvas Sidebar (Mobile/Tablet) */
+.offcanvas {
+    width: 85%;
+    max-width: 400px;
+}
+
+.offcanvas-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.offcanvas-body {
+    padding: 1rem;
+}
+
+.offcanvas-body .sidebar-section {
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .home-container {
+        padding-bottom: 4rem;
+    }
+}
+
+@media (min-width: 992px) {
+    .sidebar-column::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .sidebar-column::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .sidebar-column::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+
+    .sidebar-column::-webkit-scrollbar-thumb:hover {
+        background: #a1a1a1;
+    }
+}
