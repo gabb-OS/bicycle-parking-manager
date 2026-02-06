@@ -179,7 +179,7 @@ def leave_parking(token):
     email = token.get('email')
     user = User.get_by_email(email)
     
-    required_fields = ['longitude', 'latitude', 'timestamp']
+    required_fields = ['longitude', 'latitude', 'timestamp', 'event_id']
     for field in required_fields:
         if field not in data:
             return jsonify({"error": f"Missing required field: {field}"}), 400
@@ -193,11 +193,10 @@ def leave_parking(token):
     location_point = WKTElement(f'POINT({data["longitude"]} {data["latitude"]})', srid=4326)
     parking_area = ParkingArea.get_by_locationpoint(location_point)
     
-    target_area_id = parking_area.id if parking_area else None
-    
     # Looking for latest active park event for user.id user AND that is at least MAX_DISTANCE_METERS close to actual user location
     existing_event = ParkingEvent.get_active_park_event(
         user.id, 
+        data['event_id'],
         current_timestamp
     )
 

@@ -2,8 +2,9 @@ package com.contextaware.app_bpm.data.network
 
 import com.contextaware.app_bpm.data.model.LeaveResponse
 import com.contextaware.app_bpm.data.model.ParkResponse
-import com.contextaware.app_bpm.data.model.ParkingEvent
 import com.contextaware.app_bpm.data.model.ParkingArea
+import com.contextaware.app_bpm.data.model.ParkingEventLeave
+import com.contextaware.app_bpm.data.model.ParkingEventPark
 import com.contextaware.app_bpm.data.model.PersonalEvent
 import retrofit2.Response
 import retrofit2.http.Body
@@ -22,12 +23,12 @@ interface ParkingApiService {
     @POST("events/park")
     suspend fun parkBicycle(
         @Header("Authorization") authHeader: String,
-        @Body requestBody: ParkingEvent
+        @Body requestBody: ParkingEventPark
     ): Response<ParkResponse>
 
     @PATCH("events/leave") // Using PATCH as per backend definition
     suspend fun leaveBicycle(
         @Header("Authorization") authHeader: String,
-        @Body requestBody: ParkingEvent
+        @Body requestBody: ParkingEventLeave
     ): Response<LeaveResponse>
 }
