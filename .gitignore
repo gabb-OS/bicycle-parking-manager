@@ -134,3 +134,11 @@ frontend-bpm/*.tsbuildinfo
 # APP ANDROID
 ############################
 **/google-services.json
+
+############################
+# HAR ML
+############################
+data/
+tuning/
+*.png
+*.h5
