@@ -295,11 +295,14 @@ def get_events_by_type(event_type):
 
 
 # Get recent events
-@events_bp.route("/recent", methods=["GET"])
-def get_recent_events():
-    limit = request.args.get('limit', 10, type=int)
-    events = ParkingEvent.get_recent(limit)
-    return jsonify([event.to_dict() for event in events])
+@events_bp.route("/user/last", methods=["GET"])
+@firebase_guard
+def get_last_user_event(token):
+    email = token.get('email')
+    user = User.get_by_email(email)
+
+    last_parking = ParkingEvent.get_latest_user_event(user.id)
+    return jsonify(last_parking)
 
 
 # ----------------------------------------------------------------------
