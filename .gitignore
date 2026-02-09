@@ -138,7 +138,7 @@ frontend-bpm/*.tsbuildinfo
 ############################
 # HAR ML
 ############################
-data/
-tuning/
+har-machine-learning/data/
+har-machine-learning/tuning/
 *.png
 *.h5
