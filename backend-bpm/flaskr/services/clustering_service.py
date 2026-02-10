@@ -20,10 +20,10 @@ class ClusteringService:
     @staticmethod
     def perform_clustering():
         # 1. Fetch "Orphan" Parking Events (No associated Parking Area)
-        # We fetch ALL orphans (both PARK and LEAVE) to capture all parking sessions
-        # A completed session (LEAVE) still represents a valid parking location
+        # We only fetch PARK events to cluster parking locations
         orphan_events = ParkingEvent.query.filter(
-            ParkingEvent.parking_area_id == None
+            ParkingEvent.parking_area_id == None,
+            ParkingEvent.type == EventType.PARK
         ).all()
 
         if not orphan_events:
