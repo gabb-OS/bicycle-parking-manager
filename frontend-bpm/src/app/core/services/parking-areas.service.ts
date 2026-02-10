@@ -137,4 +137,18 @@ export class ParkinAreasService {
   private setParkingAreasSource(parkingAreas: ParkingArea[]): void {
     this.parkingAreasSource.next(parkingAreas);
   }
+
+  /**
+   * Triggers the clustering algorithm on the backend.
+   *
+   * @returns Observable<any> - An observable that emits the clustering result
+   *
+   * @description
+   * This method performs an HTTP POST request to manually trigger the parking
+   * area clustering algorithm. The backend will run the clustering service
+   * and return the result.
+   */
+  triggerClustering(): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/cluster/run`, {});
+  }
 }
