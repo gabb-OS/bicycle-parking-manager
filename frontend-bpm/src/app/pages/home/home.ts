@@ -188,22 +188,23 @@ export class Home implements OnInit, OnDestroy {
 
     const areaEvents = ParkingChartUtils.filterEventsByArea(events, filters.zone);
 
-    const filteredEvents = ParkingChartUtils.filterEventsByTimeRange(areaEvents, startDate, endDate);
+    const eventsWithingRange = ParkingChartUtils.filterEventsByTimeRange(areaEvents, startDate, endDate);
 
     // Filter the GeoJSON events to show on the map
     if (this.allParkingEvents) {
-      const filteredEventIds = new Set(filteredEvents.map(e => e.id));
+      const filteredEventIds = new Set(eventsWithingRange.map(e => e.id));
       const filteredGeoJSON: ParkingEventsGeoJSON = {
         type: 'FeatureCollection',
         features: this.allParkingEvents.features.filter(feature =>
           filteredEventIds.has(feature.properties.id)
         )
       };
+      // Update the parkingEvents to update the map display
       this.parkingEvents.set(filteredGeoJSON);
     }
 
     const processedData = ParkingChartUtils.processEvents(
-      filteredEvents,
+      eventsWithingRange,
       startDate,
       endDate,
       areaName

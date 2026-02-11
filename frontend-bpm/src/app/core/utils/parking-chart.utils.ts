@@ -292,8 +292,8 @@ export class ParkingChartUtils {
    * Filters events that overlap with a specific time range.
    *
    * An event overlaps with the range if:
-   * - It started before the range ends AND
-   * - It ended after the range starts (or is still ongoing)
+   *  - It started before the range ends AND
+   *  - It ended after the range starts OR is ongoing (end_time is null)
    *
    * @param events - Array of parking events
    * @param startDate - Start of the time range
@@ -315,7 +315,7 @@ export class ParkingChartUtils {
 
       // Handle null/undefined end_time (ongoing session)
       if (event.end_time === null || event.end_time === undefined) {
-        // Ongoing event overlaps if the range starts before now
+        // Ongoing event overlaps if the range starts before the event starts
         return true;
       }
 
