@@ -127,7 +127,7 @@ export class ParkingChartUtils {
 
   /**
    * Processes events for a multi-day view with daily aggregation.
-   * Generates one data point per day showing occupancy at noon or max occupancy.
+   * Generates one data point per day showing max occupancy.
    *
    * @param events - Array of parking events
    * @param startDate - Start of the date range
@@ -251,10 +251,27 @@ export class ParkingChartUtils {
   }
 
   /**
-   * Calculates the maximum concurrent occupancy for a specific day.
+   * Calculates the maximum concurrent occupancy for a specific day using a sweep line algorithm.
    *
-   * This method samples the occupancy at multiple points (30 mins) throughout the day
-   * and returns the maximum value found.
+   * This method collects the exact timestamps where occupancy changes
+   * (event starts and ends), sorts them, and sweeps through
+   * to find the peak.
+   *
+   *
+   * @example
+   * Given events: A(08:00-10:00), B(09:00-11:00), C(09:30-10:30), D(14:00-15:00)
+   *
+   * Sweep points:
+   * - 08:00: +1 → count=1
+   * - 09:00: +1 → count=2
+   * - 09:30: +1 → count=3 ← Maximum
+   * - 10:00: -1 → count=2
+   * - 10:30: -1 → count=1
+   * - 11:00: -1 → count=0
+   * - 14:00: +1 → count=1
+   * - 15:00: -1 → count=0
+   *
+   * Result: max occupancy = 3 (at 09:30 when A, B, and C are all active)
    *
    * @param events - Array of parking events
    * @param day - The day to analyze
@@ -264,17 +281,43 @@ export class ParkingChartUtils {
     const dayStart = startOfDay(day);
     const dayEnd = endOfDay(day);
 
-    let maxOccupancy = 0;
-    let sampleTime = new Date(dayStart);
+    // Each entry: [timestamp in ms, delta (+1 for start, -1 for end)]
+    const deltas: [number, number][] = [];
 
-    // Sample every 30 minutes throughout the day
-    while (sampleTime <= dayEnd) {
-      const occupancy = this.calculateOccupancyAtTime(events, sampleTime);
-      maxOccupancy = Math.max(maxOccupancy, occupancy);
-      sampleTime = addMinutes(sampleTime, 30);
+    for (const event of events) {
+      const startTime = parseISO(event.start_time);
+
+      // Skip events that start after the day ends
+      if (startTime > dayEnd) continue;
+
+      const hasEnd = event.end_time !== null && event.end_time !== undefined;
+      const endTime = hasEnd ? parseISO(event.end_time!) : null;
+
+      // Skip events that ended before the day starts
+      if (endTime && endTime <= dayStart) continue;
+
+      // Add +1 at the effective start (clamped to day start)
+      deltas.push([Math.max(startTime.getTime(), dayStart.getTime()), 1]);
+
+      // Add -1 at the effective end (clamped to day end), only if the event has ended
+      if (endTime) {
+        deltas.push([Math.min(endTime.getTime(), dayEnd.getTime()), -1]);
+      }
     }
 
-    return maxOccupancy;
+    // Sort by time; when times are equal, process ends (-1) before starts (+1)
+    // so we don't over-count at the exact boundary
+    deltas.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+
+    let current = 0;
+    let max = 0;
+
+    for (const [, delta] of deltas) {
+      current += delta;
+      max = Math.max(max, current);
+    }
+
+    return max;
   }
 
   /**
