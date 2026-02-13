@@ -50,20 +50,12 @@ class ParkingEvent(db.Model):
         return ParkingEvent.query.all()
 
     @staticmethod
-    def get_by_user(user_id):
-        return ParkingEvent.query.filter(ParkingEvent.user_id == user_id).all()
-
-    @staticmethod
     def get_by_parking_area(parking_area_id):
         return ParkingEvent.query.filter(ParkingEvent.parking_area_id == parking_area_id).all()
 
     @staticmethod
     def get_by_type(event_type):
         return ParkingEvent.query.filter(ParkingEvent.type == event_type).all()
-
-    @staticmethod
-    def get_recent(limit=10):
-        return ParkingEvent.query.order_by(ParkingEvent.start_time.desc()).limit(limit).all()
     
     @staticmethod
     def get_active_park_event(user_id, event_id, current_timestamp):
@@ -76,12 +68,6 @@ class ParkingEvent(db.Model):
             ParkingEvent.end_time == None
         ).order_by(ParkingEvent.start_time.desc()).first()
     
-    @staticmethod
-    def get_latest_user_event(user_id):
-        """ Get last parking event (active or no active) for a user """
-        return ParkingEvent.query.filter(
-            ParkingEvent.user_id == user_id,
-        ).order_by(ParkingEvent.start_time.desc()).first()
 
     def to_dict(self):
         """Converts the object to a dictionary for JSON responses."""

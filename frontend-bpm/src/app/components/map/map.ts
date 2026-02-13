@@ -209,7 +209,7 @@ export class MapComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private view = new View({
     center: fromLonLat([11.355432, 44.498089]),
-    zoom: 17
+    zoom: 17.5
   });
 
   /**

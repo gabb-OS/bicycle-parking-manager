@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ParkinAreasService } from '@core/services/parking-areas.service';
-import { catchError, finalize, of, take } from 'rxjs';
+import { catchError, finalize, of, take, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -30,13 +30,20 @@ export class Navbar {
           console.error('Clustering failed:', error);
           return of(null);
         }),
+        switchMap((result) => {
+          if (result) {
+            // Refetch parking areas after successful clustering
+            return this.parkingAreasService.getParkingAreasGEOJSON();
+          }
+          return of(null);
+        }),
         finalize(() => {
           this.isClusteringRunning.set(false);
         })
       )
-      .subscribe((result) => {
-        if (result) {
-          console.log('Clustering completed:', result);
+      .subscribe((parkingAreas) => {
+        if (parkingAreas) {
+          console.log('Parking areas updated after clustering');
         }
       });
   }
