@@ -114,6 +114,7 @@ export class MapComponent implements OnInit, OnDestroy, AfterViewInit {
     effect(() => {
       const events = this.parkingEvents();
       const isHeatmapEnabled = this.isHeatmapEnabled();
+      const isClusteringEnabled = this.isClusteringEnabled();
 
       if (events) {
         const features = new GeoJSON().readFeatures(events, {
@@ -122,10 +123,11 @@ export class MapComponent implements OnInit, OnDestroy, AfterViewInit {
         });
 
         // Update regular events layer
+        // Hide events layer when either heatmap or clustering is active
         if (this.parkingEventsLayer) {
           this.parkingEventsLayer.getSource()?.clear();
           this.parkingEventsLayer.getSource()?.addFeatures(features);
-          this.parkingEventsLayer.setVisible(!isHeatmapEnabled);
+          this.parkingEventsLayer.setVisible(!isHeatmapEnabled && !isClusteringEnabled);
         }
 
         // Update heatmap layer with the same features
@@ -199,8 +201,10 @@ export class MapComponent implements OnInit, OnDestroy, AfterViewInit {
         this.parkingAreasLayer.setVisible(!isClusteringEnabled);
       }
 
+      // Hide events layer when either clustering or heatmap is active
       if (this.parkingEventsLayer) {
-        this.parkingEventsLayer.setVisible(!isClusteringEnabled);
+        const isHeatmapEnabled = this.isHeatmapEnabled();
+        this.parkingEventsLayer.setVisible(!isClusteringEnabled && !isHeatmapEnabled);
       }
     });
   }
