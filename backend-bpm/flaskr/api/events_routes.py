@@ -13,96 +13,6 @@ events_bp = Blueprint('events', __name__, url_prefix='/events')
 # ----------------------------------------------------------------------
 #                           PARKING EVENTS - CREATE
 # ----------------------------------------------------------------------
-# Signal a 'parking event' (from the App)
-# Incoming request payload must contain:
-#  - user_id
-#  - longitude, latitude (gps coordinates)
-#  - type ("park" or "leave")
-#  - timestamp
-""" @events_bp.route("/parking", methods=["POST"])
-@firebase_guard
-def parking_event(token):
-    data = request.get_json()
-
-    # Get correct user     
-    email = token.get('email')
-    user = User.get_by_email(email)
-    
-    # Validate required fields
-    required_fields = ['longitude', 'latitude', 'type', 'timestamp']
-    for field in required_fields:
-        if field not in data:
-            return jsonify({"error": f"Missing required field: {field}"}), 400
-    
-    try:
-        event_type = EventType(data['type'])
-    except ValueError:
-        return jsonify({"error": "Invalid event type. Must be 'park' or 'leave'"}), 400
-    
-    # Expects an ISO_LOCAL_DATE_TIME (ISO-8601) - e.g., "2026-01-05T15:48:45"
-    try:
-        current_timestamp = datetime.fromisoformat(data['timestamp'])
-    except ValueError:
-        return jsonify({"error": "Invalid timestamp format"}), 400
-    
-    # Expects an ISO_LOCAL_DATE_TIME (ISO-8601) - e.g., "2026-01-05T15:48:45"
-    longitude = data['longitude']
-    latitude = data['latitude']
-    location_point = WKTElement(f'POINT({longitude} {latitude})', srid=4326)
-    parking_area = ParkingArea.get_by_locationpoint(location_point)
-    
-    
-    # Check which Geoprivacy mode is required
-    # If field does not exists, no privacy is applied
-    privacy_mode =  data.get("privacy_mode", "none")
-    if privacy_mode == "centroid":
-        location_point = ParkingArea.get_centroid_by_area(parking_area)
-    elif privacy_mode == "random":
-        location_point = ParkingArea.get_random_point_in_area(parking_area)
-
-    # Update parking area capacity based on event type
-    if event_type == EventType.PARK:
-        if parking_area:
-            if not parking_area.park_bicycle():
-                return jsonify({"error": "Parking area is full"}), 400
-
-        event = ParkingEvent(
-            type=event_type,
-            location_point=location_point,
-            user_id=user.id,
-            parking_area_id=parking_area.id,
-            start_time=current_timestamp
-        )
-        db.session.add(event)
-
-    else:  # LEAVE        
-        # Find active PARK event for this user/area with a prior start_time
-        existing_event = ParkingEvent.get_active_park_event(
-            user.id, 
-            parking_area.id, 
-            current_timestamp
-        )
-
-        if existing_event is None:
-            return jsonify({"error": "No corresponding active park event found"}), 400
-        
-        if parking_area:
-            if not parking_area.leave_parking():
-                return jsonify({"error": "Parking area is already empty"}), 400
-        
-        # Modify the existing event to: type is now LEAVE and updating end_time
-        existing_event.type = EventType.LEAVE
-        existing_event.end_time = current_timestamp
-        event = existing_event
-
-    db.session.commit()
-    
-    area_name = parking_area.name if parking_area else "Free Parking"
-    return jsonify({
-        "message": f"Bicycle {event_type.value} event recorded successfully",
-        "parking_area": area_name
-    }), 201 """
-
 
 @events_bp.route("/park", methods=["POST"])
 @firebase_guard
@@ -273,36 +183,6 @@ def get_user_parking_events(token):
         events_with_names.append(event.to_dict_with_parkingname())
     
     return jsonify(events_with_names)
-   
-
-# Get all events for a specific parking area
-@events_bp.route("/area/<int:area_id>", methods=["GET"])
-def get_area_events(area_id):
-    events = ParkingEvent.get_by_parking_area(area_id)
-    return jsonify([event.to_dict() for event in events])
-
-
-# Get events by type (park/leave)
-@events_bp.route("/type/<string:event_type>", methods=["GET"])
-def get_events_by_type(event_type):
-    try:
-        ev_type = EventType(event_type)
-    except ValueError:
-        return jsonify({"error": "Invalid event type. Must be 'park' or 'leave'"}), 400
-    
-    events = ParkingEvent.get_by_type(ev_type)
-    return jsonify([event.to_dict() for event in events])
-
-
-# Get recent events
-@events_bp.route("/user/last", methods=["GET"])
-@firebase_guard
-def get_last_user_event(token):
-    email = token.get('email')
-    user = User.get_by_email(email)
-
-    last_parking = ParkingEvent.get_latest_user_event(user.id)
-    return jsonify(last_parking)
 
 
 # ----------------------------------------------------------------------
@@ -313,16 +193,6 @@ def get_last_user_event(token):
 @events_bp.route("/geojson", methods=["GET"])
 def get_all_events_geojson():
     events = ParkingEvent.get_all()
-    return jsonify({
-        "type": "FeatureCollection",
-        "features": [event.to_geojson_feature() for event in events]
-    })
-
-
-# Get user events as GeoJSON FeatureCollection
-@events_bp.route("/user/<int:user_id>/geojson", methods=["GET"])
-def get_user_events_geojson(user_id):
-    events = ParkingEvent.get_by_user(user_id)
     return jsonify({
         "type": "FeatureCollection",
         "features": [event.to_geojson_feature() for event in events]
