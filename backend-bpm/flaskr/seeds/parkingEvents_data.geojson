@@ -367,7 +367,7 @@
         "id": 21,
         "user_id": 1,
         "parking_area_id": 1,
-        "start_time": "2026-01-03T08:30:00Z",
+        "start_time": "2026-02-09T08:30:00Z",
         "end_time": null,
         "event_type": "park"
       },
@@ -883,6 +883,24 @@
           44.49824731066377
         ],
         "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 49,
+        "user_id": 2,
+        "parking_area_id": 1,
+        "start_time": "2026-02-14T08:30:00Z",
+        "end_time": null,
+        "event_type": "park"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.355740,
+          44.498800
+        ]
       }
     }
   ]
