@@ -5,7 +5,7 @@ export interface ChartData {
   labels: string[];
   values: number[];
   areaName: string;
-  chartType?: 'step' | 'line' | 'bar';
+  chartType?: 'step' | 'bar';
   tooltipFormat?: string;
 }
 

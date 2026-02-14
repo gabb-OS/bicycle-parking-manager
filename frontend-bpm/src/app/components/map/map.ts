@@ -46,8 +46,6 @@ import { MapUtils } from '@core/utils/map.utils';
  *
  */
 
-/*TODO: on marker click, show popup OR open side window*/
-
 @Component({
   selector: 'app-map',
   imports: [],
@@ -55,7 +53,7 @@ import { MapUtils } from '@core/utils/map.utils';
   styleUrl: './map.css',
   standalone: true,
 })
-export class MapComponent implements OnInit, OnDestroy, AfterViewInit {
+export class MapComponent implements OnInit, AfterViewInit {
   /**
    * Reference to the tooltip element for hover information.
    */
@@ -482,12 +480,5 @@ export class MapComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
     });
-  }
-
-  /**
-   * Component cleanup lifecycle hook.
-   */
-  ngOnDestroy(): void {
-    // Effects are automatically cleaned up by Angular
   }
 }

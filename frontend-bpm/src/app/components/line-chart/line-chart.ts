@@ -72,13 +72,13 @@ export class LineChartComponent {
 
   /**
    * Builds the chart option based on the provided chart data.
-   * Dynamically switches between step, line, and bar charts based on chartType.
+   * Dynamically switches between step and bar charts based on chartType.
    *
    * @param data - The chart data containing labels, values, area name, and chart type
    * @returns EChartsCoreOption configured for the data
    */
   private buildChartOption(data: ChartData): EChartsCoreOption {
-    const chartType = data.chartType ?? 'line';
+    const chartType = data.chartType ?? 'step';
 
     return {
       title: {
@@ -131,54 +131,39 @@ export class LineChartComponent {
    * @param chartType - The type of chart to render
    * @returns Series configuration object
    */
-  private buildSeriesConfig(data: ChartData, chartType: 'step' | 'line' | 'bar'): object {
+  private buildSeriesConfig(data: ChartData, chartType: 'step' | 'bar'): object {
     const baseConfig = {
       name: 'Biciclette parcheggiate',
       data: data.values,
     };
 
-    switch (chartType) {
-      case 'step':
-        return {
-          ...baseConfig,
-          type: 'line',
-          step: 'end',
-          areaStyle: {
-            opacity: 0.3
-          },
-          lineStyle: {
-            width: 2
-          },
-          itemStyle: {
-            color: '#5470c6'
-          }
-        };
-
-      case 'bar':
-        return {
-          ...baseConfig,
-          type: 'bar',
-          barWidth: '60%',
-          itemStyle: {
-            color: '#91cc75',
-            borderRadius: [4, 4, 0, 0]
-          }
-        };
-
-      case 'line':
-      default:
-        return {
-          ...baseConfig,
-          type: 'line',
-          smooth: true,
-          areaStyle: {
-            opacity: 0.3
-          },
-          lineStyle: {
-            width: 2
-          }
-        };
+    if (chartType === 'bar') {
+      return {
+        ...baseConfig,
+        type: 'bar',
+        barWidth: '60%',
+        itemStyle: {
+          color: '#91cc75',
+          borderRadius: [4, 4, 0, 0]
+        }
+      };
     }
+
+    // Default: step chart for single-day view
+    return {
+      ...baseConfig,
+      type: 'line',
+      step: 'end',
+      areaStyle: {
+        opacity: 0.3
+      },
+      lineStyle: {
+        width: 2
+      },
+      itemStyle: {
+        color: '#5470c6'
+      }
+    };
   }
 
   /**
@@ -188,28 +173,13 @@ export class LineChartComponent {
    * @param chartType - The type of chart to render
    * @returns X-axis configuration object
    */
-  private buildXAxisConfig(data: ChartData, chartType: 'step' | 'line' | 'bar'): object {
+  private buildXAxisConfig(data: ChartData, chartType: 'step' | 'bar'): object {
     const baseConfig = {
       type: 'category',
       data: data.labels,
     };
 
-    if (chartType === 'step') {
-      // For step charts (single-day view), show more labels for time granularity
-      return {
-        ...baseConfig,
-        axisTick: {
-          show: true,
-          alignWithLabel: true,
-        },
-        axisLabel: {
-          rotate: 45,
-          fontSize: 10,
-          interval: Math.floor(data.labels.length / 12), // Show ~12 labels
-        },
-        boundaryGap: false, // Step line starts from axis
-      };
-    } else if (chartType === 'bar') {
+    if (chartType === 'bar') {
       // For bar charts (multi-day view), center labels under bars
       return {
         ...baseConfig,
@@ -220,26 +190,27 @@ export class LineChartComponent {
         axisLabel: {
           rotate: 45,
           fontSize: 10,
-          autoSkip: true,         // to improve readability, selects only some labels to show
-          autoSkipPadding: 25,    // minimum padding between labels
-          hideOverlap: true,      // forces first and last label
+          autoSkip: true,
+          autoSkipPadding: 25,
+          hideOverlap: true,
         },
-        boundaryGap: true, // Required for bar charts
-      };
-    } else {
-      // Default line chart config
-      return {
-        ...baseConfig,
-        axisTick: {
-          show: true,
-          alignWithLabel: true,
-          interval: 0,
-        },
-        axisLabel: {
-          rotate: 45,
-          fontSize: 10,
-        }
+        boundaryGap: true,
       };
     }
+
+    // Default: step chart config (single-day view), skip labels with Math.floor to keep axis readable
+    return {
+      ...baseConfig,
+      axisTick: {
+        show: true,
+        alignWithLabel: true,
+      },
+      axisLabel: {
+        rotate: 45,
+        fontSize: 10,
+        interval: Math.floor(data.labels.length / 12),
+      },
+      boundaryGap: false,
+    };
   }
 }
