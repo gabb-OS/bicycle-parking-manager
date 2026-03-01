@@ -902,6 +902,42 @@
           44.498800
         ]
       }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 50,
+        "user_id": 1,
+        "parking_area_id": 1,
+        "start_time": "2026-03-01T08:00:00Z",
+        "end_time": "2026-03-01T13:00:00Z",
+        "event_type": "leave"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.355730,
+          44.498850
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 51,
+        "user_id": 2,
+        "parking_area_id": 1,
+        "start_time": "2026-03-01T09:00:00Z",
+        "end_time": "2026-03-01T15:00:00Z",
+        "event_type": "leave"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.355750,
+          44.498880
+        ]
+      }
     }
   ]
 }
