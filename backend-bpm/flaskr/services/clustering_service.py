@@ -12,14 +12,14 @@ from flaskr.models.parking_areas import ParkingArea
 class ClusteringService:
     
     EPSILON_METERS = 10
-    EPSILON_RADIANS = EPSILON_METERS / 6371000  # ~3.14e-6
+    EPSILON_RADIANS = EPSILON_METERS / 6371000  # Earth radius in meters
     
     # MIN_SAMPLES: The number of samples (or total weight) in a neighborhood for a point to be considered as a core point.
     MIN_SAMPLES = 3
 
     @staticmethod
     def perform_clustering():
-        # 1. Fetch "Orphan" Parking Events (No associated Parking Area)
+        # Fetch "Orphan" Parking Events (No associated Parking Area)
         # We only fetch PARK events to cluster parking locations
         orphan_events = ParkingEvent.query.filter(
             ParkingEvent.parking_area_id == None,
@@ -29,7 +29,7 @@ class ClusteringService:
         if not orphan_events:
             return {"message": "No orphan events found to cluster.", "new_areas": 0}
 
-        # 2. Prepare Data for DBSCAN
+        # Prepare Data for DBSCAN
         # Extract coordinates (Lat, Lon) from GeoAlchemy objects
         coords = []
         event_map = [] # To map index back to event object
@@ -38,15 +38,13 @@ class ClusteringService:
             # location_point is a WKBElement, convert to Shapely
             point = to_shape(event.location_point)
             # Store as [lat, lon] or [x, y]. 
-            # Note: DBSCAN uses Euclidean distance by default. For small areas, degrees are okay.
-            # For high precision, you would project to meters, but degrees are fine for this prototype.
             coords.append([point.x, point.y]) 
             event_map.append(event)
 
         if len(coords) < ClusteringService.MIN_SAMPLES:
             return {"message": "Not enough data points to form a cluster.", "new_areas": 0}
 
-        # 3. Run DBSCAN
+        # Run DBSCAN
         # Convert eps from meters to radians (Earth radius ≈ 6371000 meters)
 
         # Coordinates in [latitude, longitude] order and converted to radians
@@ -65,7 +63,7 @@ class ClusteringService:
         new_areas_count = 0
         merged_areas_count = 0
 
-        # 4. Process Clusters
+        # Process Clusters
         for label in unique_labels:
             if label == -1:
                 # Label -1 means "Noise" (outliers), these points remain orphans
@@ -76,7 +74,7 @@ class ClusteringService:
             cluster_events = [event_map[i] for i in cluster_indices]
             cluster_points = [coords[i] for i in cluster_indices]
 
-            # 5. Create Convex Hull (Polygon) with padding
+            # Create Convex Hull (Polygon) with padding
             # MultiPoint creates a collection, convex_hull wraps them in a polygon
             shapely_multipoint = MultiPoint(cluster_points)
             shapely_hull = shapely_multipoint.convex_hull
@@ -95,7 +93,7 @@ class ClusteringService:
             # Count active parking sessions (PARK type = still parked)
             active_parks = sum(1 for e in cluster_events if e.type == EventType.PARK)
 
-            # 6. Check if this polygon intersects with any existing ParkingArea
+            #Check if this polygon intersects with any existing ParkingArea
             intersecting_area = ParkingArea.query.filter(
                 geo_func.ST_Intersects(ParkingArea.location_area, wkt_geom)
             ).first()
@@ -105,6 +103,8 @@ class ClusteringService:
                 merged_geom = db.session.scalar(
                     geo_func.ST_Union(intersecting_area.location_area, wkt_geom)
                 )
+                # Update the existing area with the merged geometry and new capacity 
+                # updating the location_area with the merged geometry (e.g POLYGON((...)))
                 intersecting_area.location_area = WKTElement(
                     db.session.scalar(geo_func.ST_AsText(merged_geom)), 
                     srid=4326
