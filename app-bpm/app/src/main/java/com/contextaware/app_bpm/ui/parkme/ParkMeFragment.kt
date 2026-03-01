@@ -87,10 +87,12 @@ class ParkMeFragment : Fragment() {
             activityStatus.text = "Detected activity: $activityName"
 
             when (activityType) {
+                //For physical testing: STILL
                 DetectedActivity.WALKING -> {
                     // Potential Parking Event (transitioned to WALKING)
                     performAutoAction(isParkAction = true)
                 }
+                //For physical testing: WALKING
                 DetectedActivity.ON_BICYCLE -> {
                     // Potential Leaving Event (transitioned to BICYCLE)
                     performAutoAction(isParkAction = false)

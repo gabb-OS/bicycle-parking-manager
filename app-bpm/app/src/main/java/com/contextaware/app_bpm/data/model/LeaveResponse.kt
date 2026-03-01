@@ -6,6 +6,6 @@ data class LeaveResponse(
     val message: String,
     @SerializedName("parking_area")
     val parkingArea: String,
-    @SerializedName("duration_minutes")
-    val durationMinutes: Double
+    @SerializedName("duration_seconds")
+    val durationSeconds: Double
 )

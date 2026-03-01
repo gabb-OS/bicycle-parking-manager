@@ -20,7 +20,6 @@ import org.json.JSONObject
 import retrofit2.Response
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.math.ceil
 
 class ParkMeViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -161,7 +160,11 @@ class ParkMeViewModel(application: Application) : AndroidViewModel(application) 
 
                         msg = leaveResponse?.message ?: "Parcheggio terminato"
                         area = leaveResponse?.parkingArea ?: "Free Parking"
-                        val duration = leaveResponse?.durationMinutes?.let { " (Durata: %.1f min)".format(it) } ?: ""
+                        val duration = leaveResponse?.durationSeconds?.let { totalSeconds ->
+                            val minutes = totalSeconds / 60
+                            val seconds = totalSeconds % 60
+                            " (Durata: %d min %d sec)".format(minutes.toInt(), seconds.toInt())
+                        } ?: ""
                         _statusMessage.value = "$msg in $area$duration"
                     }
                 } else {

@@ -135,13 +135,13 @@ def leave_parking(token):
     
     db.session.commit()
 
-    duration = (existing_event.end_time - existing_event.start_time).total_seconds() / 60
+    duration = (existing_event.end_time - existing_event.start_time).total_seconds()
     area_name = parking_area.name if parking_area else "Free Parking"
 
     return jsonify({
         "message": "Parking session ended successfully",
         "parking_area": area_name,
-        "duration_minutes": duration
+        "duration_seconds": duration
     }), 200
 
 # ----------------------------------------------------------------------

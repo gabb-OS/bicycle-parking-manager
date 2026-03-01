@@ -45,6 +45,7 @@ class UserActivityTransitionManager(private val context: Context) {
     fun registerActivityTransitions(onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
         val transitions = listOf(
             // Detect when user starts BICYCLING (potential Leave Parking)
+            //For physical testing: STILL
             ActivityTransition.Builder()
                 .setActivityType(DetectedActivity.ON_BICYCLE)
                 .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER)
